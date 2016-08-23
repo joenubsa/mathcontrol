@@ -232,7 +232,9 @@ var Application = function (modulo) {
                     case "ok":
                         alert("Registro procesado correctamente");
                         consultar();
-                        $(this).parents('form')[0].reset();
+                        console.log(module);
+                        jQuery('#' + module.getFormulario)[0].reset();
+                        
                         break;
                     default:
                         alert(respuesta.content);
@@ -260,7 +262,8 @@ var Application = function (modulo) {
                     case "ok":
                         alert("Registro procesado correctamente");
                         consultar();
-                        $(this).parents('form')[0].reset();
+                        console.log(module);
+                        jQuery('#' + module.getFormulario)[0].reset();
                         break;
                     default:
                         alert(respuesta.content);

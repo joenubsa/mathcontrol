@@ -1,6 +1,6 @@
 var Modulo = function () {
-    var resultContainer = 'tblTaquilla';
-    var formulario = $('#taquilla');
+    var resultContainer = 'tblUsuario';
+    var formulario = $('#usuario');
     var module = "administrar_usuario";
 
     this.inicializarFormulario = function () {

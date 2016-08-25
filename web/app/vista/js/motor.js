@@ -53,7 +53,7 @@ var Application = function (modulo) {
             url: 'index.php',
             success: function (respuesta) {
                 switch (respuesta.returned) {
-                    
+
                     case "ok" || true:
                         alert("Registro procesado correctamente");
                         break;
@@ -234,7 +234,7 @@ var Application = function (modulo) {
                         consultar();
                         console.log(module);
                         jQuery('#' + module.getFormulario)[0].reset();
-                        
+
                         break;
                     default:
                         alert(respuesta.content);

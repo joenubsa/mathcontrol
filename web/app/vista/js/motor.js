@@ -53,7 +53,6 @@ var Application = function (modulo) {
             url: 'index.php',
             success: function (respuesta) {
                 switch (respuesta.returned) {
-
                     case "ok" || true:
                         alert("Registro procesado correctamente");
                         break;

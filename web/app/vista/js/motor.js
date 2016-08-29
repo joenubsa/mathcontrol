@@ -90,11 +90,17 @@ var Application = function (modulo) {
     ;
     this.consultar = consultar;
 
-    var cargarTabla = function (r, rc) {
-        var rc = rc || modulo.getResultContainer();
+    var cargarTabla = function (r, rc, inputOption, defaultInputOptionListener) {
+        defaultInputOptionListener = defaultInputOptionListener === undefined ? true : defaultInputOptionListener === true ? true : false;
+        rc = rc || modulo.getResultContainer();
+        inputOption = inputOption === undefined ? 'radio' : inputOption;        
         var tabla = $('#' + rc);
         tabla.find('tbody').empty();
         var resultset = r;
+        if (!resultset) {
+            console.log("Error de datos en la carga de la tabla");
+            return false;
+        }
         if (resultset.length === 0 || !resultset) {
             var tr = $('<tr>').appendTo(tabla);
             $('<td colspan=99>').html("No se encontraror registros").appendTo(tr);
@@ -107,15 +113,19 @@ var Application = function (modulo) {
             }
         }
 
-        tabla.find('tbody tr').each(function () {
-            var celdaID = $(this).find('td').eq(0);
-            var radio = $('<input>').attr('type', 'radio').attr('name', rc + '_conse').attr('value', celdaID.html());
-            radio.on('click', function () {
-                $('#id').val($(this).val());
-                consultar($(this).val(), 'formulario');
+        if (inputOption) {
+            tabla.find('tbody tr').each(function () {
+                var celdaID = $(this).find('td').eq(0);
+                var radio = $('<input>').attr('type', inputOption).attr('name', rc + '_conse').attr('value', celdaID.html());
+                if (defaultInputOptionListener) {
+                    radio.on('click', function () {
+                        $('#id').val($(this).val());
+                        consultar($(this).val(), 'formulario');
+                    });
+                }
+                celdaID.html(radio);
             });
-            celdaID.html(radio);
-        });
+        }
 
         try {
             modulo.onCargaTabla(rc);
@@ -149,6 +159,11 @@ var Application = function (modulo) {
 
     var cargarFormulario = function (r) {
         modulo.cargarFormulario(r);
+        try {
+            modulo.onCargarFormulario(r);
+        } catch (e) {
+
+        }
     };
 
     this.ejecutar = function (evento, addData, formulario) {

@@ -2,12 +2,14 @@ var Modulo = function () {
     var resultContainer = 'tblArticulo';
     var formulario = $('#articulo');
     var module = "administrar_articulo";
+    var ListaArticulos = null;
 
     this.inicializarFormulario = function () {
         $('#id').hide();
         app.consultar();
         app.consultar(null, 'modulo_id', 'modulo_id');
-        inicializarEventos();
+        inicializarEventos();        
+        app.consultar(null, 'ListaArticulos', 'ListaArticulos');        
     };
 
     var inicializarEventos = function () {
@@ -45,25 +47,19 @@ var Modulo = function () {
     this.procesarConsulta = function (r, c) {
         switch (c) {
             case "modulo_id":
-                app.cargarSelect('modulo_id', r)
+                app.cargarSelect('modulo_id', r);
                 break;
-            case "articulo_id":
-                refrescarArticuloSelect(r);
+            case "ListaArticulos":
+                cargarArticulos(r.content);                
                 break;
         }
     };
 
     var app = new Application(this);
 
-    var articulo_labelOnClick = function () {
-        var modulo_id = +$('#modulo_id').val();
-        if (!modulo_id || isNaN(modulo_id) || modulo_id === 0) {
-            return false;
-        }
-        var args = {
-            modulo_id: modulo_id
-        };
-        app.consultar(null, 'articulo_id', 'articulo_id', args);
+    var articulo_labelOnClick = function () {        
+        var selar = new seleccionarArticulos();
+        selar.cargarTablaArticulos(null);
     };
 
     var refrescarArticuloSelect = function (r) {
@@ -94,6 +90,30 @@ var Modulo = function () {
         var nombre = $(fila).find('td').eq(1).html();
         $('#articulo_id').val(id);
         $('#articulo_label').val(nombre);
+    };
+    
+    var cargarArticulos = function(r){        
+        ListaArticulos = r;   
+        console.log(ListaArticulos);
+    };
+    
+    var seleccionarArticulos = function (){        
+        this.cargarTablaArticulos = function (articulo_padre){
+            articulo_padre = articulo_padre | null;
+            var lista = obtenerArticulosParaMostrar(articulo_padre);
+            console.log(lista);
+        };
+        
+        function obtenerArticulosParaMostrar (articulo_padre){            
+            var ListaArticulosReturn = [];
+            for (var i in ListaArticulos){
+                alert(ListaArticulos[i].articulo_id + " vs ap:" + articulo_padre);
+                if (ListaArticulos[i].articulo_id === articulo_padre){
+                    ListaArticulosReturn.push(ListaArticulos[i]);
+                }
+            }
+            return ListaArticulosReturn;
+        }
     };
 
 };

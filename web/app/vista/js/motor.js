@@ -246,9 +246,7 @@ var Application = function (modulo) {
                     case "ok":
                         alert("Registro procesado correctamente");
                         consultar();
-                        console.log(module);
-                        jQuery('#' + module.getFormulario)[0].reset();
-
+                        module.getFormulario.reset();
                         break;
                     default:
                         alert(respuesta.content);
@@ -277,7 +275,7 @@ var Application = function (modulo) {
                         alert("Registro procesado correctamente");
                         consultar();
                         console.log(module);
-                        jQuery('#' + module.getFormulario)[0].reset();
+                        module.getFormulario[0].reset();
                         break;
                     default:
                         alert(respuesta.content);

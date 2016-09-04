@@ -8,7 +8,7 @@ var Modulo = function () {
         $('#id, #articulo_id').hide();
         app.consultar();
         app.consultar(null, 'modulo_id', 'modulo_id');
-        inicializarEventos();
+        inicializarEventos();        
         app.consultar(null, 'ListaArticulos', 'ListaArticulos');
         articulosPicker = new ArticulosPicker();
     };
@@ -39,7 +39,6 @@ var Modulo = function () {
         $('#modulo_id').val(valores[0]['modulo_id']);
         $('#articulo_id').val(valores[0]['articulo_id']);
         $('#estado').val(valores[0]['estado']);
-        $('#mostrarControl').val(valores[0]['mostrarControl']);
     };
 
     this.onCargarFormulario = function (r) {

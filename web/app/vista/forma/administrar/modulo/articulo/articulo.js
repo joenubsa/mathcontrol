@@ -3,13 +3,14 @@ var Modulo = function () {
     var formulario = $('#articulo');
     var module = "administrar_articulo";
     var ListaArticulos = null;
-
+    var articulosPicker = null;
     this.inicializarFormulario = function () {
         $('#id').hide();
         app.consultar();
         app.consultar(null, 'modulo_id', 'modulo_id');
         inicializarEventos();        
-        app.consultar(null, 'ListaArticulos', 'ListaArticulos');        
+        app.consultar(null, 'ListaArticulos', 'ListaArticulos');
+        articulosPicker = new ArticulosPicker();
     };
 
     var inicializarEventos = function () {
@@ -58,8 +59,7 @@ var Modulo = function () {
     var app = new Application(this);
 
     var articulo_labelOnClick = function () {        
-        var selar = new seleccionarArticulos();
-        selar.cargarTablaArticulos(null);
+        articulosPicker.cargarTablaArticulos(null);
     };
 
     var refrescarArticuloSelect = function (r) {
@@ -76,40 +76,53 @@ var Modulo = function () {
 
     var ajustarSelectorArticulo_table = function(c) {
         var tabla = $('#' + c);
-        tabla.find('tbody tr').each(function () {
+        tabla.find('tbody tr').each(function () {            
             $(this).find('td').eq(0).hide();
-            $(this).find('td').eq(2).hide();
-            $(this).on('click', function(){
-                selectorArticulo_table_onTdClick(this);
+            $(this).find('td').eq(3).hide();
+            $(this).find('td').eq(1).on('click', function(){
+                selectorArticulo_table_onTdClick($(this).parents('tr'));
             });
         });
     };
     
     var selectorArticulo_table_onTdClick = function(fila){
         var id = $(fila).find('td').eq(0).html();
-        var nombre = $(fila).find('td').eq(1).html();
+        var nombre = $(fila).find('td').eq(1).find('span').html();
         $('#articulo_id').val(id);
         $('#articulo_label').val(nombre);
     };
     
     var cargarArticulos = function(r){        
-        ListaArticulos = r;   
-        console.log(ListaArticulos);
+        ListaArticulos = r;        
     };
     
-    var seleccionarArticulos = function (){        
-        this.cargarTablaArticulos = function (articulo_padre){
-            articulo_padre = articulo_padre | null;
+    var ArticulosPicker = function (){        
+        this.cargarTablaArticulos = function (articulo_padre){            
+            articulo_padre = !isNaN(articulo_padre) ? articulo_padre : null;
             var lista = obtenerArticulosParaMostrar(articulo_padre);
+            app.cargarTabla(lista, "selectorArticulo_table", false);
             console.log(lista);
         };
         
-        function obtenerArticulosParaMostrar (articulo_padre){            
+        function obtenerArticulosParaMostrar (articulo){
             var ListaArticulosReturn = [];
             for (var i in ListaArticulos){
-                alert(ListaArticulos[i].articulo_id + " vs ap:" + articulo_padre);
-                if (ListaArticulos[i].articulo_id === articulo_padre){
-                    ListaArticulosReturn.push(ListaArticulos[i]);
+                if (+ListaArticulos[i].articulo_id === +articulo || +ListaArticulos[i].id === +articulo){   
+                    var html = +ListaArticulos[i].id === +articulo ? "Atrás" : "Ver más";                    
+                    var verMas = $('<span>').prop('class', 'seleccionArticulo-vermas').html(html).on('click', function(){
+                        var rowId = +$(this).parents('tr').find('td').eq(0).html();
+                        var padreId = +$(this).parents('tr').find('td').eq(3).html();
+                        var target = +rowId === +articulo ? padreId : rowId;
+
+                        console.log(target)
+                        articulosPicker.cargarTablaArticulos(+target);                        
+                    });
+                    ListaArticulosReturn.push({
+                        id: ListaArticulos[i].id,
+                        nombre: "<span class='seleccionArticulo-seleccionar'>" + ListaArticulos[i].nombre + "</a>",                        
+                        desplegar: verMas,
+                        padreId: ListaArticulos[i].articulo_id
+                    });
                 }
             }
             return ListaArticulosReturn;

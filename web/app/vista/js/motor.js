@@ -25,7 +25,6 @@ var Application = function (modulo) {
         modulo.getFormulario().on('submit', function () {
             if ($('#id').val() === '') {
                 guardar();
-                $(this)[0].reset();
             } else {
                 editar();
             }
@@ -216,6 +215,7 @@ var Application = function (modulo) {
                 switch (respuesta.returned) {
                     case "ok":
                         alert("Registro procesado correctamente");
+                        modulo.getFormulario()[0].reset();
                         break;
                     case "id":
                         consultar();
@@ -246,7 +246,7 @@ var Application = function (modulo) {
                     case "ok":
                         alert("Registro procesado correctamente");
                         consultar();
-                        module.getFormulario.reset();
+                        modulo.getFormulario()[0].reset();
                         break;
                     default:
                         alert(respuesta.content);
@@ -275,7 +275,7 @@ var Application = function (modulo) {
                         alert("Registro procesado correctamente");
                         consultar();
                         console.log(module);
-                        module.getFormulario[0].reset();
+                        modulo.getFormulario[0].reset();
                         break;
                     default:
                         alert(respuesta.content);

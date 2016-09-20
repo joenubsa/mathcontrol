@@ -17,6 +17,23 @@ var Modulo = function () {
         $('#articulo_label').on('click', function () {
             articulo_labelOnClick(this);
         });
+
+        $('form').on('reset', function () {
+            $('.text-editor-box .editionbox').html('');
+        });
+
+        $('.text-editor-box .editionbox').on('keyup', function () {
+            actualizarEditorTextarea();
+        });
+        $('.text-editor-box .editionbox').on('change', function () {
+            actualizarEditorTextarea();
+        });
+        $('.text-editor-box .editionbox').on('input', function () {
+            actualizarEditorTextarea();
+        });
+        $('.text-editor-box .editionbox').on('propertyChanged', function () {
+            actualizarEditorTextarea();
+        });
     };
 
     this.getResultContainer = function () {
@@ -40,13 +57,16 @@ var Modulo = function () {
         $('#articulo_id').val(valores[0]['articulo_id']);
         $('#estado').val(valores[0]['estado']);
         $('#mostrarControl').val(valores[0]['mostrarControl']);
+        $('#eshito').val(valores[0]['esHito']);
+        console.log(valores[0]);
     };
 
     this.onCargarFormulario = function (r) {
-        if (r[0].articulo_id !== null){
+        if (r[0].articulo_id !== null) {
             var datos = articulosPicker.buscarRegistro(r[0].articulo_id);
             $('#articulo_label').val(datos.nombre);
         }
+        $('.text-editor-box .editionbox').html($('#descripcion').val());
     };
 
     this.procesarConsulta = function (r, c) {
@@ -55,14 +75,14 @@ var Modulo = function () {
                 app.cargarSelect('modulo_id', r);
                 break;
             case "ListaArticulos":
-                cargarArticulos(r.content);                
+                cargarArticulos(r.content);
                 break;
         }
     };
 
     var app = new Application(this);
 
-    var articulo_labelOnClick = function (sender) {        
+    var articulo_labelOnClick = function (sender) {
         articulosPicker.cargarTablaArticulos(null);
         articulosPicker.mostrarElemento(sender);
     };
@@ -76,43 +96,47 @@ var Modulo = function () {
         }
     };
 
-    var ajustarSelectorArticulo_table = function(c) {
+    var ajustarSelectorArticulo_table = function (c) {
         var tabla = $('#' + c);
-        tabla.find('tbody tr').each(function () {            
+        tabla.find('tbody tr').each(function () {
             $(this).find('td').eq(0).hide();
             $(this).find('td').eq(3).hide();
-            $(this).find('td').eq(1).on('click', function(){
+            $(this).find('td').eq(1).on('click', function () {
                 selectorArticulo_table_onTdClick($(this).parents('tr'));
                 articulosPicker.ocultarElemento();
             });
         });
     };
-    
-    var selectorArticulo_table_onTdClick = function(fila){
+
+    var selectorArticulo_table_onTdClick = function (fila) {
         var id = $(fila).find('td').eq(0).html();
         var nombre = $(fila).find('td').eq(1).find('span').html();
         $('#articulo_id').val(id);
         $('#articulo_label').val(nombre);
     };
-    
-    var cargarArticulos = function(r){
-        ListaArticulos = r;        
+
+    var cargarArticulos = function (r) {
+        ListaArticulos = r;
     };
-    
-    var ArticulosPicker = function (){
+
+    var actualizarEditorTextarea = function () {
+        $('#descripcion').val($('.text-editor-box .editionbox').html());
+    };
+
+    var ArticulosPicker = function () {
         var Elemento = "selectorArticulo_table";
-        this.cargarTablaArticulos = function (articulo_padre){            
+        this.cargarTablaArticulos = function (articulo_padre) {
             articulo_padre = !isNaN(articulo_padre) ? articulo_padre : null;
             var lista = obtenerArticulosParaMostrar(articulo_padre);
             app.cargarTabla(lista, Elemento, false);
         };
-        
-        function obtenerArticulosParaMostrar (articulo){
+
+        function obtenerArticulosParaMostrar(articulo) {
             var ListaArticulosReturn = [];
-            for (var i in ListaArticulos){
-                if (+ListaArticulos[i].articulo_id === +articulo || +ListaArticulos[i].id === +articulo){   
-                    var html = +ListaArticulos[i].id === +articulo ? "Atrás" : "Ver más";                    
-                    var verMas = $('<span>').prop('class', 'seleccionArticulo-vermas').html(html).on('click', function(){
+            for (var i in ListaArticulos) {
+                if (+ListaArticulos[i].articulo_id === +articulo || +ListaArticulos[i].id === +articulo) {
+                    var html = +ListaArticulos[i].id === +articulo ? "Atrás" : "Ver más";
+                    var verMas = $('<span>').prop('class', 'seleccionArticulo-vermas').html(html).on('click', function () {
                         var rowId = +$(this).parents('tr').find('td').eq(0).html();
                         var padreId = +$(this).parents('tr').find('td').eq(3).html();
                         var target = +rowId === +articulo ? padreId : rowId;
@@ -120,7 +144,7 @@ var Modulo = function () {
                     });
                     ListaArticulosReturn.push({
                         id: ListaArticulos[i].id,
-                        nombre: "<span class='seleccionArticulo-seleccionar'>" + ListaArticulos[i].nombre + "</a>",                        
+                        nombre: "<span class='seleccionArticulo-seleccionar'>" + ListaArticulos[i].nombre + "</a>",
                         desplegar: verMas,
                         padreId: ListaArticulos[i].articulo_id
                     });
@@ -128,33 +152,33 @@ var Modulo = function () {
             }
             return ListaArticulosReturn;
         }
-        
-        this.mostrarElemento = function(sender){
+
+        this.mostrarElemento = function (sender) {
             $('#' + Elemento).toggle('slow');
             sender = $(sender);
-            var senderPosition = $(sender).parent('label').position();            
+            var senderPosition = $(sender).parent('label').position();
             $('#' + Elemento).css({
-                "top" : (senderPosition.top + sender.parents('label').height()) + "px",
-                "left" : senderPosition.left + "px"
+                "top": (senderPosition.top + sender.parents('label').height()) + "px",
+                "left": senderPosition.left + "px"
             });
-            
+
         };
-        
-        var ocultarElemento = function(){
+
+        var ocultarElemento = function () {
             $('#' + Elemento).hide('slow');
-        };        
+        };
         this.ocultarElemento = ocultarElemento;
-        
-        this.buscarRegistro = function(id){
+
+        this.buscarRegistro = function (id) {
             var Registro = null;
-            for (var i in ListaArticulos){
-                if (+ListaArticulos[i].id === +id){
+            for (var i in ListaArticulos) {
+                if (+ListaArticulos[i].id === +id) {
                     Registro = ListaArticulos[i];
                     break;
                 }
             }
             return Registro;
-        }
+        };
     };
 
 };

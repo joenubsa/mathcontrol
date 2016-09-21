@@ -58,7 +58,6 @@ var Modulo = function () {
         $('#estado').val(valores[0]['estado']);
         $('#mostrarControl').val(valores[0]['mostrarControl']);
         $('#eshito').val(valores[0]['esHito']);
-        console.log(valores[0]);
     };
 
     this.onCargarFormulario = function (r) {

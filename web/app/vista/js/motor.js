@@ -218,6 +218,7 @@ var Application = function (modulo) {
                         modulo.getFormulario()[0].reset();
                         break;
                     case "id":
+                        modulo.getFormulario()[0].reset();
                         consultar();
                         break;
                     default:
@@ -379,6 +380,23 @@ var Application = function (modulo) {
             comMinuto.val('' + (+f[1]));
         }
     };
+    this.getVars = function(varname){
+        var varsString = document.location.search.substr(1);
+        var vars = varsString.split('&');
+        for (var i in vars){
+            vars[i] = [vars[i].substr(0, vars[i].indexOf('=')), vars[i].substr(vars[i].indexOf('=') + 1)];
+        }
+        if (varname){
+            for (var i in vars){
+                if (vars[i][0] === varname){
+                    return vars[i][1];
+                }
+            }
+            return undefined;
+        }
+        return vars;        
+    };
+    
     cargarEventosGenerales();
 };
 

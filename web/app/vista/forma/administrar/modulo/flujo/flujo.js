@@ -2,7 +2,8 @@ var Modulo = function () {
     var resultContainer = 'tblFlujo';
     var formulario = $('#flujo');
     var module = "administrar_flujo";
-
+    var moduleFunctions = new ModuleFunctions(this);
+    var moduleEvents = new ModuleEvents(this);
     this.inicializarFormulario = function () {
         inicializarEventos();
         $('#id, #articulo_id').hide();        
@@ -58,15 +59,28 @@ var Modulo = function () {
 
     this.onCargaTabla = function (c) {
         switch (c) {
-            case "selectorArticulo_table":
-                ajustarSelectorArticulo_table(c);
+            case "tblFlujo":
+                moduleFunctions.generarLinksTabla(c);
                 break;
         }
     };
-
-
+    
+    
 };
 
-var eventDictionary = function(){
+var ModuleFunctions = function (modulo){    
+    this.generarLinksTabla = function (tid){
+        $('#' + tid).find('tbody tr').each(function(){
+            var id = $(this).find('td').eq(0).find('input').val();
+            var celda = $(this).find('td').eq(1);
+            var contenido = celda.html();
+            var linkElement = $('<a>').attr('target', '_self').attr('href', '/?modulo=administrar/flujograma&flujo=' + btoa(id)).html(contenido);
+            celda.html(linkElement);
+        });
+    };
+    
+};
+
+var ModuleEvents = function(modulo){
     
 };

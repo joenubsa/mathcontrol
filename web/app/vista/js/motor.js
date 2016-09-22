@@ -214,7 +214,7 @@ var Application = function (modulo) {
             success: function (respuesta) {
                 switch (respuesta.returned) {
                     case "ok":
-                        alert("Registro procesado correctamente");
+                        alert("Registro guardado correctamente");
                         modulo.getFormulario()[0].reset();
                         break;
                     case "id":
@@ -245,7 +245,7 @@ var Application = function (modulo) {
             success: function (respuesta) {
                 switch (respuesta.returned) {
                     case "ok":
-                        alert("Registro procesado correctamente");
+                        alert("Registro editado correctamente");
                         consultar();
                         modulo.getFormulario()[0].reset();
                         break;
@@ -273,10 +273,9 @@ var Application = function (modulo) {
             success: function (respuesta) {
                 switch (respuesta.returned) {
                     case "ok":
-                        alert("Registro procesado correctamente");
+                        alert("Registro borrado correctamente");
                         consultar();
-                        console.log(module);
-                        modulo.getFormulario[0].reset();
+                        modulo.getFormulario()[0].reset();
                         break;
                     default:
                         alert(respuesta.content);

@@ -21,6 +21,7 @@ var Modulo = function () {
 
         $('form').on('reset', function () {
             $('.text-editor-box .editionbox').html('');
+            app.consultar(null, 'ListaArticulos', 'ListaArticulos');
         });
 
         $('.text-editor-box .editionbox').on('keyup', function () {
@@ -68,6 +69,7 @@ var Modulo = function () {
     };
 
     this.onCargarFormulario = function (r) {
+        app.consultar(null, 'ListaArticulos', 'ListaArticulos');
         if (r[0].articulo_id !== null) {
             var datos = articulosPicker.buscarRegistro(r[0].articulo_id);
             $('#articulo_label').val(datos.nombre);

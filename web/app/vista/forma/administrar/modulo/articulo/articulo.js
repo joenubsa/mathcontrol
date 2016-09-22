@@ -4,6 +4,7 @@ var Modulo = function () {
     var module = "administrar_articulo";
     var ListaArticulos = null;
     var articulosPicker = null;
+    var removerEstilos = false;
     this.inicializarFormulario = function () {
         $('#id, #articulo_id').hide();
         app.consultar();
@@ -33,6 +34,12 @@ var Modulo = function () {
         });
         $('.text-editor-box .editionbox').on('propertyChanged', function () {
             actualizarEditorTextarea();
+        });
+
+        $('.text-editor-box .editionbox').on('paste', function () {
+            setTimeout(function () {
+                removerEstilos()
+            }, 300);
         });
     };
 
@@ -120,6 +127,14 @@ var Modulo = function () {
 
     var actualizarEditorTextarea = function () {
         $('#descripcion').val($('.text-editor-box .editionbox').html());
+    };
+
+    var removerEstilos = function () {
+        var texto = $('.text-editor-box .editionbox').html();
+        var regex = /style="[\s\S]+?"/gm;
+        texto = texto.replace(regex, '');
+        $('.text-editor-box .editionbox').html(texto);
+        actualizarEditorTextarea();
     };
 
     var ArticulosPicker = function () {

@@ -2,9 +2,12 @@ var Modulo = function () {
     var resultContainer = 'tblArticulo';
     var formulario = $('#articulo');
     var module = "administrar_articulo";
+    var moduleFunctions = new ModuleFunctions(this);
+    var moduleEvents = new ModuleEvents(this);
     var ListaArticulos = null;
     var articulosPicker = null;
     var removerEstilos = false;
+    var textEditorTools = null;
     this.inicializarFormulario = function () {
         $('#id, #articulo_id').hide();
         app.consultar();
@@ -12,6 +15,7 @@ var Modulo = function () {
         inicializarEventos();
         app.consultar(null, 'ListaArticulos', 'ListaArticulos');
         articulosPicker = new ArticulosPicker();
+        textEditorTools = new TextEditorTools();
     };
 
     var inicializarEventos = function () {
@@ -196,5 +200,49 @@ var Modulo = function () {
             return Registro;
         };
     };
+
+    var TextEditorTools = function () {
+        var editor = $(".text-editor-box .editionbox");
+        var selection = undefined;
+        var attachEvents = function () {
+            events = new eventCollection();
+            var toolBox = $('.text-editor-box .toolbox');
+            toolBox.find('.icon').each(function () {
+                switch ($(this).attr('id')) {
+                    case "icon-sup":
+                        $(this).on('click', events.supEvent);
+                        break;
+                }
+            });
+            editor.on('mouseup', events.editorSelect);
+            editor.on('mousedown', events.);
+        };
+
+        var eventCollection = function () {
+            this.supEvent = function (event) {                
+                                
+            };
+
+            this.editorSelect = function (event) {                
+                if (window.getSelection().toString().length > 2){
+                    selection = window.getSelection().toString();
+                    editor[0].selectionStart;
+                }
+            };
+        };
+
+        var inicializar = function () {
+            attachEvents();
+        };
+        inicializar();
+    };
+
+};
+
+var ModuleFunctions = function (modulo) {
+
+};
+
+var ModuleEvents = function (modulo) {
 
 };

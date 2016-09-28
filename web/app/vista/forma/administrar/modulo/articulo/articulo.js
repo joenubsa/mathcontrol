@@ -210,25 +210,41 @@ var Modulo = function () {
             toolBox.find('.icon').each(function () {
                 switch ($(this).attr('id')) {
                     case "icon-sup":
-                        $(this).on('click', events.supEvent);
+                        $(this).on('mousedown', events.supEvent);
                         break;
                 }
             });
             editor.on('mouseup', events.editorSelect);
-            editor.on('mousedown', events.);
+
         };
 
         var eventCollection = function () {
-            this.supEvent = function (event) {                
-                                
+            this.supEvent = function (event) {
+                $(".text-editor-box .editionbox")[0].focus();
+                event.preventDefault();
+                insertTag('sup');
             };
 
-            this.editorSelect = function (event) {                
-                if (window.getSelection().toString().length > 2){
-                    selection = window.getSelection().toString();
-                    editor[0].selectionStart;
-                }
+            this.editorSelect = function (event) {
+                selection = window.getSelection();
             };
+        };
+        
+        var insertTag = function(tag){
+                //var newContent = '<' + tag + '>' + selection.toString() + '</' + tag + '>';
+                //console.log(newContent);
+                var node = document.createElement(tag);
+                var content = document.createTextNode(selection.toString());
+                node.appendChild(content);
+                var sel, range;
+                if (selection) {
+                    sel = selection;
+                    if (sel.rangeCount) {
+                        range = sel.getRangeAt(0);
+                        range.deleteContents();
+                        range.insertNode(node);
+                    }
+                }
         };
 
         var inicializar = function () {

@@ -4,13 +4,10 @@ var Modulo = function () {
     var module = "administrar_articulo";
     var moduleFunctions = new ModuleFunctions(this);
     var moduleEvents = new ModuleEvents(this);
-    if (document.addEventListener) {
-        document.addEventListener('paste', moduleEvents.onPasteTriggered, false);
-    }
     var ListaArticulos = null;
     var articulosPicker = null;
     var removerEstilos = false;
-    var textEditorTools = null;
+    var textEditorEngine = null;
     this.inicializarFormulario = function () {
         $('#id, #articulo_id').hide();
         app.consultar();
@@ -18,7 +15,8 @@ var Modulo = function () {
         inicializarEventos();
         app.consultar(null, 'ListaArticulos', 'ListaArticulos');
         articulosPicker = new ArticulosPicker();
-        textEditorTools = new TextEditorTools();
+        textEditorEngine = new TextEditorEngine(this, $('.text-editor-box .editionbox'), 'articulo');
+        textEditorEngine.activar();
     };
 
     var inicializarEventos = function () {
@@ -31,24 +29,7 @@ var Modulo = function () {
             app.consultar(null, 'ListaArticulos', 'ListaArticulos');
         });
 
-//        $('.text-editor-box .editionbox').on('keyup', function () {
-//            actualizarEditorTextarea();
-//        });
-        $('.text-editor-box .editionbox').on('change', function () {
-            actualizarEditorTextarea();
-        });
-//        $('.text-editor-box .editionbox').on('input', function () {
-//            actualizarEditorTextarea();
-//        });
-        $('.text-editor-box .editionbox').on('propertyChanged', function () {
-            actualizarEditorTextarea();
-        });
 
-        $('.text-editor-box .editionbox').on('paste', function () {
-            setTimeout(function () {
-                removerEstilos()
-            }, 300);
-        });
     };
 
     this.getResultContainer = function () {
@@ -62,7 +43,7 @@ var Modulo = function () {
     this.getModule = function () {
         return module;
     };
-
+        
     this.cargarFormulario = function (r) {
         var valores = r;
         $('#id').val(valores[0]['id']);
@@ -81,7 +62,7 @@ var Modulo = function () {
             var datos = articulosPicker.buscarRegistro(r[0].articulo_id);
             $('#articulo_label').val(datos.nombre);
         }
-        $('.text-editor-box .editionbox').html($('#descripcion').val());
+        textEditorEngine.actualizarEditor();
     };
 
     this.procesarConsulta = function (r, c) {
@@ -95,7 +76,7 @@ var Modulo = function () {
             case "result_":
                 switch (r.content.type) {
                     case "cargarImagen":
-                        actualizarImagen(r.content.id, r.content.link)
+                        textEditorEngine.actualizarImagen(r.content.id, r.content.link)
                         break;
                 }
                 break;
@@ -103,7 +84,11 @@ var Modulo = function () {
     };
 
     var app = new Application(this);
-
+    
+    this.getApp = function(){
+        return app;
+    };
+    
     var articulo_labelOnClick = function (sender) {
         articulosPicker.cargarTablaArticulos(null);
         articulosPicker.mostrarElemento(sender);
@@ -139,46 +124,6 @@ var Modulo = function () {
 
     var cargarArticulos = function (r) {
         ListaArticulos = r;
-    };
-
-    var actualizarEditorTextarea = function () {
-        var contenidoActual = $('.text-editor-box .editionbox').html();
-        var nuevoContenido = procesarContenido(nuevoContenido);
-        $('#descripcion').val(contenidoActual);
-    };
-
-    var procesarContenido = function (contenido) {
-        var editor = $('.text-editor-box .editionbox');
-        procesarImagenes(editor);
-    };
-
-    var procesarImagenes = function (editor) {
-        editor.find('img[src^=data]').each(function (identifier) {
-            var id = "img_" + identifier;
-            $(this).attr('id', id);
-            var addData = {
-                imageContent: JSON.stringify($(this).attr('src')),
-                id: id
-            };
-
-            app.ejecutar('cargarImagen', addData);
-        });
-    };
-    var actualizarImagen = function (id, filename) {
-        var ruta = "/public/images/articulo/" + filename;
-        $("#" + id).attr("src", ruta);
-//        var contenido = $('.text-editor-box .editionbox').html();
-//        contenido = contenido.replace($("#" + id)[0].outerHTML, '<div style="width:200px;height:200px;resize:both;">' + $("#" + id)[0].outerHTML + '</div>');
-//        $('.text-editor-box .editionbox').html(contenido);
-    };
-
-
-    var removerEstilos = function () {
-        var texto = $('.text-editor-box .editionbox').html();
-        var regex = /style="[\s\S]+?"/gm;
-        texto = texto.replace(regex, '');
-        $('.text-editor-box .editionbox').html(texto);
-        actualizarEditorTextarea();
     };
 
     var ArticulosPicker = function () {
@@ -239,91 +184,6 @@ var Modulo = function () {
         };
     };
 
-    var TextEditorTools = function () {
-        var editor = $(".text-editor-box .editionbox");
-        var selection = undefined;
-        var attachEvents = function () {
-            events = new eventCollection();
-            var toolBox = $('.text-editor-box .toolbox');
-            toolBox.find('.icon').each(function () {
-                switch ($(this).attr('id')) {
-                    case "icon-h2":
-                        $(this).on('mousedown', events.h2Event);
-                        break;
-                    case "icon-h3":
-                        $(this).on('mousedown', events.h3Event);
-                        break;
-                    case "icon-i":
-                        $(this).on('mousedown', events.iEvent);
-                        break;
-                    case "icon-b":
-                        $(this).on('mousedown', events.bEvent);
-                        break;
-                    case "icon-sup":
-                        $(this).on('mousedown', events.supEvent);
-                        break;
-                }
-            });
-            editor.on('mouseup', events.editorSelect);
-
-        };
-
-        var eventCollection = function () {
-            this.h2Event = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
-                event.preventDefault();
-                insertTag('h2');
-            };
-            this.h3Event = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
-                event.preventDefault();
-                insertTag('h3');
-            };
-            this.iEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
-                event.preventDefault();
-                insertTag('i');
-            };
-            this.bEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
-                event.preventDefault();
-                insertTag('b');
-            };
-            
-            this.supEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
-                event.preventDefault();
-                insertTag('sup');
-            };
-
-            this.editorSelect = function (event) {
-                selection = window.getSelection();
-            };
-        };
-
-        var insertTag = function (tag) {
-            //var newContent = '<' + tag + '>' + selection.toString() + '</' + tag + '>';
-            //console.log(newContent);
-            var node = document.createElement(tag);
-            var content = document.createTextNode(selection.toString());
-            node.appendChild(content);
-            var sel, range;
-            if (selection) {
-                sel = selection;
-                if (sel.rangeCount) {
-                    range = sel.getRangeAt(0);
-                    range.deleteContents();
-                    range.insertNode(node);
-                }
-            }
-        };
-
-        var inicializar = function () {
-            attachEvents();
-        };
-        inicializar();
-    };
-
 };
 
 var ModuleFunctions = function (modulo) {
@@ -331,29 +191,5 @@ var ModuleFunctions = function (modulo) {
 };
 
 var ModuleEvents = function (modulo) {
-    this.onPasteTriggered = function (e) {
-        if (typeof e.clipboardData !== 'undefined') {
-            var copiedData = e.clipboardData.items[0]; //Get the clipboard data
 
-            /*If the clipboard data is of type image, read the data*/
-            if (copiedData.type.indexOf("image") === 0) {
-                var imageFile = copiedData.getAsFile();
-
-                /*We will use HTML5 FileReader API to read the image file*/
-                var reader = new FileReader();
-
-                reader.onload = function (evt) {
-                    var result = evt.target.result; //base64 encoded image
-
-                    /*Create an image element and append it to the content editable div*/
-                    var img = document.createElement("img");
-                    img.src = result;
-                    $('.text-editor-box .editionbox').append(img);
-                };
-
-                /*Read the image file*/
-                reader.readAsDataURL(imageFile);
-            }
-        }
-    }
 };

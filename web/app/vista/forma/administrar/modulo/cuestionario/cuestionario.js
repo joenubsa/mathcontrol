@@ -3,12 +3,15 @@ var Modulo = function () {
     var formulario = $('#cuestionario');
     var module = "administrar_cuestionario";
     var cuestionarioPanel;
+    var textEditorEngine = null;
     this.inicializarFormulario = function () {
         $('#id, #cuerpo').hide();
         app.consultar();
         app.consultar(null, 'articulo_id', 'articulo_id');
         inicializarEventos();
         cuestionarioPanel = new CuestionarioPanel();
+        textEditorEngine = new TextEditorEngine(this, $('.text-editor-box .editionbox'), 'cuestionario');
+        textEditorEngine.activar();
     };
 
     var inicializarEventos = function () {
@@ -40,6 +43,7 @@ var Modulo = function () {
 
     this.onCargarFormulario = function (r) {
         cuestionarioPanel.generarDOM();
+        textEditorEngine.actualizarEditor();
     };
 
     this.procesarConsulta = function (r, c) {
@@ -47,13 +51,19 @@ var Modulo = function () {
             case "articulo_id":
                 app.cargarSelect('articulo_id', r);
                 break;
+            case "result_":
+                switch (r.content.type) {
+                    case "cargarImagen":
+                        textEditorEngine.actualizarImagen(r.content.id, r.content.link)
+                        break;
+                }
         }
     };
 
     var app = new Application(this);
-
-
-
+    this.getApp = function(){
+        return app;
+    };
 
     this.onCargaTabla = function (c) {
         switch (c) {
@@ -77,15 +87,17 @@ var Modulo = function () {
             var panelRespuesta = PanelRespuestaDiv.clone(true);
             panelRespuesta.appendTo('.PanelCuerpo');
             var idPregunta = PanelCuerpo.find('.PanelRespuesta').length;
-            panelRespuesta.find('preguntaIdLabel').html(idPregunta);
-            panelRespuesta.find('preguntaTexto').html($('#textoPregunta').val());
+            panelRespuesta.find('.preguntaIdLabel').html(idPregunta);
+            panelRespuesta.find('.preguntaTexto').html($('#textoPregunta').val());
             ActualizarCuerpo();
+            $('#textoPregunta').val('');
+            $('#textoPregunta').siblings('.editionbox').html('');
         };
-        
-        this.AgregarRespuesta = function (sender, respuesta) {            
+
+        this.AgregarRespuesta = function (sender, respuesta) {
             var tabla = getTabla(sender);
             var texto = $(sender).parents('.PanelRespuesta').find('.textoRespuesta').val();
-            if (respuesta){
+            if (respuesta) {
                 texto = respuesta.texto;
             }
             var row = $('<tr>');
@@ -94,12 +106,12 @@ var Modulo = function () {
                 alert("No puedes agregar más respuestas");
                 return false;
             }
-            if (respuesta){
+            if (respuesta) {
                 $('<td>').html(respuesta.id).appendTo(row).parents('tr').attr('class', (respuesta.correcta ? 'correcta' : false));
             } else {
                 $('<td>').html(respuestaLabel[indice]).appendTo(row);
             }
-            
+
             $('<td>').html(texto).appendTo(row);
             var accionesTd = $('<td>').appendTo(row);
             $('<span>').attr('class', 'accion').html('Quitar').appendTo(accionesTd).on('click', function () {
@@ -113,9 +125,9 @@ var Modulo = function () {
                 ActualizarCuerpo();
             });
             tabla.find('tbody').append(row);
-            if (!respuesta){
+            if (!respuesta) {
                 ActualizarCuerpo();
-            }            
+            }
         };
 
         var quitarPregunta = function (sender) {
@@ -168,8 +180,8 @@ var Modulo = function () {
         };
 
         this.generarDOM = function () {
-            $('.PanelRespuesta').each(function(id){
-                if (id >= 0){
+            $('.PanelRespuesta').each(function (id) {
+                if (id >= 0) {
                     $(this).remove();
                 }
             });
@@ -180,24 +192,22 @@ var Modulo = function () {
                 console.log("Cues json no parse");
                 return false;
             }
-            console.log(Cuestionario);
+
             for (var i in Cuestionario) {
                 var panelRespuesta = PanelRespuestaDiv.clone(true);
+
                 panelRespuesta.appendTo('.PanelCuerpo');
                 var id = Cuestionario[i].id;
                 var texto = Cuestionario[i].texto;
-                var respuestas = Cuestionario[i].respuestas;                
+                var respuestas = Cuestionario[i].respuestas;
                 panelRespuesta.find('.preguntaIdLabel').html(id);
                 panelRespuesta.find('.preguntaTexto').html(texto);
                 var tabla = panelRespuesta.find('.tblRespuestas');
                 for (var k in respuestas) {
                     this.AgregarRespuesta(tabla, respuestas[k]);
-                }                
+                }
+
             }
         };
-
-
     };
-
-
 };

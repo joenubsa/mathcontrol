@@ -168,6 +168,11 @@ var Modulo = function () {
         };
 
         this.generarDOM = function () {
+            $('.PanelRespuesta').each(function(id){
+                if (id >= 0){
+                    $(this).remove();
+                }
+            });
             var Cuestionario = null;
             try {
                 Cuestionario = JSON.parse($('#cuerpo').val());
@@ -175,7 +180,7 @@ var Modulo = function () {
                 console.log("Cues json no parse");
                 return false;
             }
-
+            console.log(Cuestionario);
             for (var i in Cuestionario) {
                 var panelRespuesta = PanelRespuestaDiv.clone(true);
                 panelRespuesta.appendTo('.PanelCuerpo');
@@ -187,11 +192,8 @@ var Modulo = function () {
                 var tabla = panelRespuesta.find('.tblRespuestas');
                 for (var k in respuestas) {
                     this.AgregarRespuesta(tabla, respuestas[k]);
-                }
-                
+                }                
             }
-
-
         };
 
 

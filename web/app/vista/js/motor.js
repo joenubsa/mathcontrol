@@ -546,47 +546,52 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
 
         var eventCollection = function () {
             this.h2Event = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
+                editor[0].focus();
                 event.preventDefault();
                 insertTag('h2');
+                editor.trigger('change');
             };
             this.h3Event = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
+                editor[0].focus();
                 event.preventDefault();
                 insertTag('h3');
+                editor.trigger('change');
             };
             this.iEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
+                editor[0].focus();
                 event.preventDefault();
                 insertTag('i');
+                editor.trigger('change');
             };
             this.bEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
+                editor[0].focus();
                 event.preventDefault();
                 insertTag('b');
+                editor.trigger('change');
             };
 
             this.supEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
+                editor[0].focus();
                 event.preventDefault();
                 insertTag('sup');
+                editor.trigger('change');
             };
             
             this.clearscreenEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
+                editor[0].focus();
                 event.preventDefault();
                 $(".text-editor-box .editionbox").html('');
+                editor.trigger('change');
             };
             
             this.removetagsEvent = function (event) {
-                $(".text-editor-box .editionbox")[0].focus();
+                editor[0].focus();
                 event.preventDefault();
                 var findTags = /<(?!img|br|p)\/?.*?>/g;                
-                var texto = $(".text-editor-box .editionbox").html();
-//                console.log(texto.match(findTags));
-//                return true;
+                var texto = editor.html();
                 var texto = texto.replace(findTags, '');
-                $('div.text-editor-box .editionbox').html(texto);
+                editor.html(texto);
+                editor.trigger('change');
             };
 
             this.editorSelect = function (event) {
@@ -608,25 +613,35 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
                 }
             }
         };
+        
+        var crearHerramientas = function(){            
+            $('<div>').attr('class', 'icon').attr('id', 'icon-h2').html('H2').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-h3').html('H3').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-i').html('<i>i</i>').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-b').html('<strong>B</strong>').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-sup').html('X<sup>2</sup>').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-removetags').html('<strike>&lt;C&gt;</strike>').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-clearscreen').html('[x]').appendTo('div.text-editor-box .toolbox');
+        };
 
         var inicializar = function () {
-            attachEvents();
+            crearHerramientas();
+            attachEvents();            
         };
         inicializar();
     };
 
     var actualizarEditorTextarea = function () {
-        var contenidoActual = $('div.text-editor-box .editionbox').html();
+        var contenidoActual = editor.html();
         var nuevoContenido = procesarContenido(nuevoContenido);
         $('div.text-editor-box textarea').val(contenidoActual);
     };
 
     var procesarContenido = function (contenido) {
-        var editor = $('div.text-editor-box .editionbox');
-        procesarImagenes(editor);
+        procesarImagenes();
     };
 
-    var procesarImagenes = function (editor) {
+    var procesarImagenes = function () {
         editor.find('img[src^=data]').each(function (identifier) {
             var id = "img_" + identifier;
             $(this).attr('id', id);
@@ -634,16 +649,12 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
                 imageContent: JSON.stringify($(this).attr('src')),
                 id: id
             };
-
             app.ejecutar('cargarImagen', addData);
         });
     };
     this.actualizarImagen = function (id, filename) {
         var ruta = "/public/images/" + carpeta + "/" + filename;
         $("#" + id).attr("src", ruta);
-//        var contenido = $('.text-editor-box .editionbox').html();
-//        contenido = contenido.replace($("#" + id)[0].outerHTML, '<div style="width:200px;height:200px;resize:both;">' + $("#" + id)[0].outerHTML + '</div>');
-//        $('.text-editor-box .editionbox').html(contenido);
     };
 
     var removerEstilos = function () {

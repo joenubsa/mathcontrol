@@ -46,16 +46,20 @@ var Modulo = function () {
     this.procesarConsulta = function (r, c) {
         switch (c){
             case "lista_articulos":
-                app.cargarTabla(r.content, "ArticulosHitosSinAsignar")
+                app.cargarTabla(r.content, "ArticulosHitosSinAsignar");
                 break;
         }
     };
 
     var app = new Application(this);
-
+    this.getApp = function(){
+        return app;
+    };
     this.onCargaTabla = function (c) {
         switch (c) {
-            
+            case "ArticulosHitosSinAsignar":
+                moduleFunctions.articulosNoAsignadosCargados();
+                break;
         }
     };
 
@@ -63,7 +67,17 @@ var Modulo = function () {
 };
 
 var ModuleFunctions = function (modulo){    
+    this.articulosNoAsignadosCargados = function(){
         
+    };
+    
+    this.articuloSucesorPositivoCargado = function(){
+        
+    };
+    
+    this.articuloSucesorNegativoCargado = function(){
+        
+    };    
 };
 
 var ModuleEvents = function(modulo){

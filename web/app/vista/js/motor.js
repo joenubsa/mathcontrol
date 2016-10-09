@@ -179,7 +179,7 @@ var Application = function (modulo) {
             dataType: 'json',
             url: 'index.php',
             success: function (respuesta) {
-                switch (respuesta.returned) {
+                switch (respuesta.returned) {                    
                     case "ok":
                         alert(respuesta.content);
                         try {
@@ -193,6 +193,9 @@ var Application = function (modulo) {
                     case "error":
                         alert("Hay un problema: " + respuesta.content);
                         break;
+                    case null:
+                        alert(respuesta.content);
+                        break;                        
                 }
             },
             error: function (error) {
@@ -215,7 +218,7 @@ var Application = function (modulo) {
                 switch (respuesta.returned) {
                     case "ok":
                         alert("Registro guardado correctamente");
-                        modulo.getFormulario()[0].reset();
+                        //modulo.getFormulario()[0].reset();
                         break;
                     case "id":
                         modulo.getFormulario()[0].reset();
@@ -247,7 +250,7 @@ var Application = function (modulo) {
                     case "ok":
                         alert("Registro editado correctamente");
                         consultar();
-                        modulo.getFormulario()[0].reset();
+                        //modulo.getFormulario()[0].reset();
                         break;
                     default:
                         alert(respuesta.content);
@@ -470,45 +473,45 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
     var app = modulo.getApp();
     var agregarEventos = function () {
 
-        $('.text-editor-box .editionbox').on('keyup', function () {
-            actualizarEditorTextarea();
+        $('.text-editor-box .editionbox').on('keyup', function (event) {
+            actualizarEditorTextarea(event);
         });
-        $('.text-editor-box .editionbox').on('change', function () {
-            actualizarEditorTextarea();
+        $('.text-editor-box .editionbox').on('change', function (event) {
+            actualizarEditorTextarea(event);
         });
-        $('.text-editor-box .editionbox').on('input', function () {
-            actualizarEditorTextarea();
+        $('.text-editor-box .editionbox').on('input', function (event) {
+            actualizarEditorTextarea(event);
         });
-        $('.text-editor-box .editionbox').on('propertyChanged', function () {
-            actualizarEditorTextarea();
+        $('.text-editor-box .editionbox').on('propertyChanged', function (event) {
+            actualizarEditorTextarea(event);
         });
 
-        $('.text-editor-box .editionbox').on('paste', function () {
+        $('.text-editor-box .editionbox').on('paste', function (event) {
             setTimeout(function () {
-                removerEstilos()
+                actualizarEditorTextarea(false);
             }, 300);
         });
-        if (document.addEventListener) {
-            document.addEventListener('paste', alPegar, false);
-        }
+//        if (document.addEventListener) {
+//            document.addEventListener('paste', alPegar, false);
+//        }
     };
 
-    var alPegar = function (e) {
-        if (typeof e.clipboardData !== 'undefined') {
-            var copiedData = e.clipboardData.items[0];
-            if (copiedData.type.indexOf("image") === 0) {
-                var imageFile = copiedData.getAsFile();
-                var reader = new FileReader();
-                reader.onload = function (evt) {
-                    var result = evt.target.result;
-                    var img = document.createElement("img");
-                    img.src = result;
-                    $('.text-editor-box .editionbox').append(img);
-                };
-                reader.readAsDataURL(imageFile);
-            }
-        }
-    };
+//    var alPegar = function (e) {
+//        if (typeof e.clipboardData !== 'undefined') {
+//            var copiedData = e.clipboardData.items[0];
+//            if (copiedData.type.indexOf("image") === 0) {
+//                var imageFile = copiedData.getAsFile();
+//                var reader = new FileReader();
+//                reader.onload = function (evt) {
+//                    var result = evt.target.result;
+//                    var img = document.createElement("img");
+//                    img.src = result;
+//                    $('.text-editor-box .editionbox').append(img);
+//                };
+//                reader.readAsDataURL(imageFile);
+//            }
+//        }
+//    };
 
     var TextEditorTools = function () {
         var selection = undefined;
@@ -537,6 +540,15 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
                         break;
                     case "icon-removetags":
                         $(this).on('mousedown', events.removetagsEvent);
+                        break;
+                    case "icon-red":
+                        $(this).on('mousedown', events.redColorEvent);
+                        break;
+                    case "icon-blue":
+                        $(this).on('mousedown', events.blueColorEvent);
+                        break;
+                    case "icon-green":
+                        $(this).on('mousedown', events.greenColorEvent);
                         break;
                 }
             });
@@ -592,16 +604,37 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
                 var texto = texto.replace(findTags, '');
                 editor.html(texto);
                 editor.trigger('change');
+                removerEstilos();
             };
 
             this.editorSelect = function (event) {
                 selection = window.getSelection();
             };
+            
+            this.redColorEvent = function (event) {
+                editor[0].focus();
+                event.preventDefault();
+                insertTag('span', 'color:red');
+                editor.trigger('change');
+            };
+            this.blueColorEvent = function (event) {
+                editor[0].focus();
+                event.preventDefault();
+                insertTag('span', 'color:blue');
+                editor.trigger('change');
+            };
+            this.greenColorEvent = function (event) {
+                editor[0].focus();
+                event.preventDefault();
+                insertTag('span', 'color:green');
+                editor.trigger('change');
+            };
         };
 
-        var insertTag = function (tag) {
+        var insertTag = function (tag, style) {
             var node = document.createElement(tag);
             var content = document.createTextNode(selection.toString());
+            node.setAttribute('style', style);
             node.appendChild(content);
             var sel, range;
             if (selection) {
@@ -614,7 +647,10 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
             }
         };
         
-        var crearHerramientas = function(){            
+        var crearHerramientas = function(){
+            $('<div>').attr('class', 'icon').attr('id', 'icon-green').html('<span style="color:green">&#198;</span>').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-blue').html('<span style="color:blue">&#198;</span>').appendTo('div.text-editor-box .toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-red').html('<span style="color:red">&#198;</span>').appendTo('div.text-editor-box .toolbox');
             $('<div>').attr('class', 'icon').attr('id', 'icon-h2').html('H2').appendTo('div.text-editor-box .toolbox');
             $('<div>').attr('class', 'icon').attr('id', 'icon-h3').html('H3').appendTo('div.text-editor-box .toolbox');
             $('<div>').attr('class', 'icon').attr('id', 'icon-i').html('<i>i</i>').appendTo('div.text-editor-box .toolbox');
@@ -631,20 +667,21 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
         inicializar();
     };
 
-    var actualizarEditorTextarea = function () {
+    var actualizarEditorTextarea = function (event) {
         var contenidoActual = editor.html();
-        var nuevoContenido = procesarContenido(nuevoContenido);
         $('div.text-editor-box textarea').val(contenidoActual);
-    };
-
-    var procesarContenido = function (contenido) {
-        procesarImagenes();
+        if (!event){
+            procesarImagenes();
+        }
     };
 
     var procesarImagenes = function () {
-        editor.find('img[src^=data]').each(function (identifier) {
+        editor.find('img').each(function(identifier){
             var id = "img_" + identifier;
             $(this).attr('id', id);
+        });
+        editor.find('img[src^=data]').each(function () {     
+            var id = $(this).attr('id'); 
             var addData = {
                 imageContent: JSON.stringify($(this).attr('src')),
                 id: id

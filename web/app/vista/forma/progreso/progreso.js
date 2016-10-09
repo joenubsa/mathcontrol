@@ -4,14 +4,15 @@ var Modulo = function () {
     var module = "progreso";
     var moduleFunctions = new ModuleFunctions(this);
     var moduleEvents = new ModuleEvents(this);
-
+    this.ModuleFunctions = moduleFunctions;
     this.inicializarFormulario = function () {
         $('#id').hide();
         inicializarEventos();
-        app.consultar();
+        //app.consultar();
     };
 
     var inicializarEventos = function () {
+        $('.modulo-icon').on('click', moduleEvents.accionesModulo);
 
     };
 
@@ -32,11 +33,13 @@ var Modulo = function () {
 
     this.procesarConsulta = function (r, c) {
         switch (c) {
-
+            case "articulo_actual":
+                moduleFunctions.renderizarArticulo(r.content[0]);
+                break;
         }
     };
 
-    this.onCargaTabla = function (c) {
+    this.onCargaTabla = function (c) {        
         switch (c) {
 
         }
@@ -55,12 +58,31 @@ var Modulo = function () {
     };
 
     var app = new Application(this);
+    this.getApp = function (){
+        return app;
+    };
 };
 
-var ModuleFunctions = function (modulo) {
-
+var ModuleFunctions = function (modulo) {    
+    this.consultarArticulo = function(moduloId){
+        var app = modulo.getApp();
+        var args = {
+            modulo: moduloId
+        };
+        app.consultar(null, 'articulo_actual', 'articulo_actual', args);
+    };
+    
+    this.renderizarArticulo = function(r){
+        console.log(r);
+        $('.progreso_articulo-container .titulo').html(r.titulo);
+        $('.progreso_articulo-container .cuerpo').html(r.descripcion);
+    };  
+    
 };
 
-var ModuleEvents = function (modulo) {
-
+var ModuleEvents = function (modulo) {    
+    this.accionesModulo = function (event){        
+        var moduloId = $(event.target).attr('id');
+        modulo.ModuleFunctions.consultarArticulo(moduloId);
+    };
 };

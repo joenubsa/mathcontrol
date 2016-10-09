@@ -56,7 +56,7 @@ var Application = function (modulo) {
                         alert("Registro procesado correctamente");
                         break;
                     case "error":
-                        alert("Error crítico: " + respuesta.content);
+                        alert("Hay un problema: " + respuesta.content);
                         break;
                     case "data":
                         switch (llenar) {
@@ -191,7 +191,7 @@ var Application = function (modulo) {
                         modulo.procesarConsulta(respuesta, 'result_', evento);
                         break;
                     case "error":
-                        alert("Error crítico: " + respuesta.content);
+                        alert("Hay un problema: " + respuesta.content);
                         break;
                 }
             },

@@ -194,6 +194,7 @@ var Application = function (modulo) {
                         alert("Hay un problema: " + respuesta.content);
                         break;
                     case null:
+                    case "message":
                         alert(respuesta.content);
                         break;                        
                 }

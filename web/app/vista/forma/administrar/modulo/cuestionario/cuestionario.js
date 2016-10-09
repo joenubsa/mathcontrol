@@ -12,6 +12,7 @@ var Modulo = function () {
         cuestionarioPanel = new CuestionarioPanel();
         textEditorEngine = new TextEditorEngine(this, $('.text-editor-box .editionbox'), 'cuestionario');
         textEditorEngine.activar();
+        $('#icon-green, #icon-blue, #icon-red, #icon-h2, #icon-h3').remove();
     };
 
     var inicializarEventos = function () {
@@ -61,7 +62,7 @@ var Modulo = function () {
     };
 
     var app = new Application(this);
-    this.getApp = function(){
+    this.getApp = function () {
         return app;
     };
 
@@ -85,12 +86,13 @@ var Modulo = function () {
         $('.PanelRespuesta').remove();
         this.AgregarPregunta = function () {
             var panelRespuesta = PanelRespuestaDiv.clone(true);
-            panelRespuesta.appendTo('.PanelCuerpo');
+            panelRespuesta.appendTo('.PanelCuerpo .Preguntas');
             var idPregunta = PanelCuerpo.find('.PanelRespuesta').length;
             panelRespuesta.find('.preguntaIdLabel').html(idPregunta);
             panelRespuesta.find('.preguntaTexto').html($('#textoPregunta').val());
             ActualizarCuerpo();
             $('#textoPregunta').val('');
+            $(".PanelCuerpo .Preguntas").animate({ scrollTop: $(".PanelCuerpo .Preguntas").get(0).scrollHeight }, 1000);
             $('#textoPregunta').siblings('.editionbox').html('');
         };
 
@@ -98,7 +100,7 @@ var Modulo = function () {
             var tabla = getTabla(sender);
             var texto = $(sender).parents('.PanelRespuesta').find('.textoRespuesta').val();
             if (respuesta) {
-                texto = respuesta.texto;
+                texto = decodeURI(respuesta.texto);
             }
             var row = $('<tr>');
             var indice = tabla.find('tbody tr').length;
@@ -125,8 +127,11 @@ var Modulo = function () {
                 ActualizarCuerpo();
             });
             tabla.find('tbody').append(row);
+            $(sender).parents('.PanelRespuesta').find('.textoRespuesta').val('');
+            $(sender).parents('.PanelRespuesta').find('.textoRespuesta')[0].focus();
             if (!respuesta) {
                 ActualizarCuerpo();
+                $(".PanelCuerpo .Preguntas").animate({ scrollTop: $(".PanelCuerpo .Preguntas").get(0).scrollHeight }, 1000);
             }
         };
 
@@ -150,17 +155,17 @@ var Modulo = function () {
 
         var ActualizarCuerpo = function () {
             var Cuestionario = [];
-            var panel = $('.PanelCuerpo .PanelRespuesta');
+            var panel = $('.PanelCuerpo .Preguntas .PanelRespuesta');
             panel.each(function () {
                 var idPregunta = $(this).find('.preguntaIdLabel').html();
-                var textoPregunta = $(this).find('.preguntaTexto').html();
+                var textoPregunta = encodeURI($(this).find('.preguntaTexto').html());
 
                 var Respuestas = [];
                 $(this).find('.tblRespuestas tbody tr').each(function () {
                     var correcta = $(this).is('.correcta');
                     Respuestas.push({
                         id: $(this).find('td').eq(0).html(),
-                        texto: $(this).find('td').eq(1).html(),
+                        texto: encodeURI($(this).find('td').eq(1).html()),
                         correcta: correcta
                     });
                 });
@@ -195,10 +200,9 @@ var Modulo = function () {
 
             for (var i in Cuestionario) {
                 var panelRespuesta = PanelRespuestaDiv.clone(true);
-
-                panelRespuesta.appendTo('.PanelCuerpo');
+                panelRespuesta.appendTo('.PanelCuerpo .Preguntas');
                 var id = Cuestionario[i].id;
-                var texto = Cuestionario[i].texto;
+                var texto = decodeURI(Cuestionario[i].texto);
                 var respuestas = Cuestionario[i].respuestas;
                 panelRespuesta.find('.preguntaIdLabel').html(id);
                 panelRespuesta.find('.preguntaTexto').html(texto);

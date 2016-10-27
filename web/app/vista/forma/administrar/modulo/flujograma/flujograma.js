@@ -40,19 +40,22 @@ var Modulo = function () {
     };
 
     this.onCargarFormulario = function (r) {
-        
+
     };
 
     this.procesarConsulta = function (r, c) {
-        switch (c){
+        switch (c) {
             case "lista_articulos":
                 app.cargarTabla(r.content, "ArticulosHitosSinAsignar");
+                break;
+            case "lista_articulos_filtro":
+                app.cargarTabla(r.content, "ArticuloSucesorPositivo");
                 break;
         }
     };
 
     var app = new Application(this);
-    this.getApp = function(){
+    this.getApp = function () {
         return app;
     };
     this.onCargaTabla = function (c) {
@@ -66,20 +69,37 @@ var Modulo = function () {
 
 };
 
-var ModuleFunctions = function (modulo){    
-    this.articulosNoAsignadosCargados = function(){
-        
+var ModuleFunctions = function (modulo) {
+    var app;
+    this.articulosNoAsignadosCargados = function () {
+        app = modulo.getApp();
+        $('input[name=ArticulosHitosSinAsignar_conse]').on('click', function () {
+            var args = {
+                flujo: app.getVars('flujo'),
+                idSeleccion_1: $('input[name=ArticulosHitosSinAsignar_conse]:checked').val()
+            };
+            app.consultar(null, 'lista_articulos_filtro', 'lista_articulos_filtro', args);
+        });
     };
-    
-    this.articuloSucesorPositivoCargado = function(){
-        
+
+    this.articuloSucesorPositivoCargado = function () {
+        app = modulo.getApp();
+        $('input[name=ArticuloSucesorPositivo_conse]').on('click', function () {
+            var args = {
+                flujo: app.getVars('flujo'),
+                idSeleccion_1: $('input[name=ArticulosHitosSinAsignar_conse]:checked').val(),
+                idSeleccion_2: $('input[name=ArticuloSucesorPositivo_conse]:checked').val()        
+                
+            };
+            app.consultar(null, 'lista_articulos_filtro', 'lista_articulos_filtro', args);
+        });
     };
-    
-    this.articuloSucesorNegativoCargado = function(){
-        
-    };    
+
+    this.articuloSucesorNegativoCargado = function () {
+
+    };
 };
 
-var ModuleEvents = function(modulo){
-    
+var ModuleEvents = function (modulo) {
+
 };

@@ -68,7 +68,7 @@ var Modulo = function () {
 
     this.onCargaTabla = function (c) {
         switch (c) {
-
+            
         }
     };
 

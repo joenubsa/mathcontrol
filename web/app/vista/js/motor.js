@@ -92,7 +92,7 @@ var Application = function (modulo) {
     var cargarTabla = function (r, rc, inputOption, defaultInputOptionListener) {
         defaultInputOptionListener = defaultInputOptionListener === undefined ? true : defaultInputOptionListener === true ? true : false;
         rc = rc || modulo.getResultContainer();
-        inputOption = inputOption === undefined ? 'radio' : inputOption;        
+        inputOption = inputOption === undefined ? 'radio' : inputOption;
         var tabla = $('#' + rc);
         tabla.find('tbody').empty();
         var resultset = r;
@@ -179,7 +179,7 @@ var Application = function (modulo) {
             dataType: 'json',
             url: 'index.php',
             success: function (respuesta) {
-                switch (respuesta.returned) {                    
+                switch (respuesta.returned) {
                     case "ok":
                         alert(respuesta.content);
                         try {
@@ -196,7 +196,7 @@ var Application = function (modulo) {
                     case null:
                     case "message":
                         alert(respuesta.content);
-                        break;                        
+                        break;
                 }
             },
             error: function (error) {
@@ -383,32 +383,32 @@ var Application = function (modulo) {
             comMinuto.val('' + (+f[1]));
         }
     };
-    this.getVars = function(varname){
+    this.getVars = function (varname) {
         var varsString = document.location.search.substr(1);
         var vars = varsString.split('&');
-        for (var i in vars){
+        for (var i in vars) {
             vars[i] = [vars[i].substr(0, vars[i].indexOf('=')), vars[i].substr(vars[i].indexOf('=') + 1)];
         }
-        if (varname){
-            for (var i in vars){
-                if (vars[i][0] === varname){
+        if (varname) {
+            for (var i in vars) {
+                if (vars[i][0] === varname) {
                     return vars[i][1];
                 }
             }
             return undefined;
         }
-        return vars;        
+        return vars;
     };
-    
+
     cargarEventosGenerales();
 };
 
-var Archivero = function (input, dir, exten, prefijo, module) {
+var Archivero = function (input, dir, exten, prefijo, modulo) {
     $('<div>').attr('class', 'boton_carga').html('Elegir...').appendTo($('#' + input).parent());
     var fechaMarca = new Date().getFullYear() + '' + (new Date().getMonth() + 1 < 10 ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)) + '' + (new Date().getDate() < 10 ? '0' + new Date().getDate() : new Date().getDate()) + '' + (new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()) + '' + (new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()) + '' + (new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds());
     $('#' + input).attr('readonly', true);
     $('#' + input).attr('class', 'boton_carga_campo');
-    var prefijo = prefijo ? prefijo + '_' + fechaMarca + '_' : fechaMarca + '_';
+    prefijo = prefijo ? prefijo + '_' + fechaMarca + '_' : fechaMarca + '_';
     var divboton = $('#' + input).siblings('div.boton_carga')[0];
     var extOpc, extStr = '';
     if (exten) {
@@ -433,16 +433,17 @@ var Archivero = function (input, dir, exten, prefijo, module) {
             }
         },
         data: {
-            destino: dir,
+            destino: '/public' + dir,
             pfx: prefijo,
             accion: 'cargarArchivo',
-            modulo: module
+            modulo: modulo
         },
         onComplete: function (file, response) {
             if (response !== 'error') {
                 $(divboton).html('Elegir...');
                 this.enable();
                 $('#' + input).val(response);
+                console.log(response);
                 $('#' + input).on('click', function () {
                     window.open(dir + '/' + response, '_blank');
                 });
@@ -589,18 +590,18 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
                 insertTag('sup');
                 editor.trigger('change');
             };
-            
+
             this.clearscreenEvent = function (event) {
                 editor[0].focus();
                 event.preventDefault();
                 $(".text-editor-box .editionbox").html('');
                 editor.trigger('change');
             };
-            
+
             this.removetagsEvent = function (event) {
                 editor[0].focus();
                 event.preventDefault();
-                var findTags = /<(?!img|br|p)\/?.*?>/g;                
+                var findTags = /<(?!img|br|p)\/?.*?>/g;
                 var texto = editor.html();
                 var texto = texto.replace(findTags, '');
                 editor.html(texto);
@@ -611,7 +612,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
             this.editorSelect = function (event) {
                 selection = window.getSelection();
             };
-            
+
             this.redColorEvent = function (event) {
                 editor[0].focus();
                 event.preventDefault();
@@ -647,8 +648,8 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
                 }
             }
         };
-        
-        var crearHerramientas = function(){
+
+        var crearHerramientas = function () {
             $('<div>').attr('class', 'icon').attr('id', 'icon-green').html('<span style="color:green">&#198;</span>').appendTo('div.text-editor-box .toolbox');
             $('<div>').attr('class', 'icon').attr('id', 'icon-blue').html('<span style="color:blue">&#198;</span>').appendTo('div.text-editor-box .toolbox');
             $('<div>').attr('class', 'icon').attr('id', 'icon-red').html('<span style="color:red">&#198;</span>').appendTo('div.text-editor-box .toolbox');
@@ -663,7 +664,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
 
         var inicializar = function () {
             crearHerramientas();
-            attachEvents();            
+            attachEvents();
         };
         inicializar();
     };
@@ -671,18 +672,18 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
     var actualizarEditorTextarea = function (event) {
         var contenidoActual = editor.html();
         $('div.text-editor-box textarea').val(contenidoActual);
-        if (!event){
+        if (!event) {
             procesarImagenes();
         }
     };
 
     var procesarImagenes = function () {
-        editor.find('img').each(function(identifier){
+        editor.find('img').each(function (identifier) {
             var id = "img_" + identifier;
             $(this).attr('id', id);
         });
-        editor.find('img[src^=data]').each(function () {     
-            var id = $(this).attr('id'); 
+        editor.find('img[src^=data]').each(function () {
+            var id = $(this).attr('id');
             var addData = {
                 imageContent: JSON.stringify($(this).attr('src')),
                 id: id
@@ -702,8 +703,8 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
         $('div.text-editor-box .editionbox').html(texto);
         actualizarEditorTextarea();
     };
-    
-    this.actualizarEditor = function(){
+
+    this.actualizarEditor = function () {
         editor.html(editor.siblings('textarea').val());
     };
 

@@ -6,7 +6,7 @@ var Modulo = function () {
     var moduleEvents = new ModuleEvents(this);
     this.inicializarFormulario = function () {
         inicializarEventos();
-        $('#id, #articulo_id').hide();        
+        $('#id, #articulo_id').hide();
         app.consultar();
         app.consultar(null, 'modulo_id', 'modulo_id');
     };
@@ -56,6 +56,9 @@ var Modulo = function () {
     };
 
     var app = new Application(this);
+    this.getApp = function () {
+        return app;
+    };
 
     this.onCargaTabla = function (c) {
         switch (c) {
@@ -64,13 +67,13 @@ var Modulo = function () {
                 break;
         }
     };
-    
-    
+
+
 };
 
-var ModuleFunctions = function (modulo){    
-    this.generarLinksTabla = function (tid){
-        $('#' + tid).find('tbody tr').each(function(){
+var ModuleFunctions = function (modulo) {
+    this.generarLinksTabla = function (tid) {
+        $('#' + tid).find('tbody tr').each(function () {
             var id = $(this).find('td').eq(0).find('input').val();
             var celda = $(this).find('td').eq(1);
             var contenido = celda.html();
@@ -78,9 +81,9 @@ var ModuleFunctions = function (modulo){
             celda.html(linkElement);
         });
     };
-    
+
 };
 
-var ModuleEvents = function(modulo){
-    
+var ModuleEvents = function (modulo) {
+
 };

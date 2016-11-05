@@ -2,10 +2,13 @@ var Modulo = function () {
     var resultContainer = 'tblUsuario';
     var formulario = $('#usuario');
     var module = "administrar_usuario";
+    var moduleFunctions = new ModuleFunctions(this);
+    var moduleEvents = new ModuleEvents(this);
 
     this.inicializarFormulario = function () {
         $('#id').hide();
         app.consultar();
+        new Archivero('txtArchivoMasivo', '/attachments', 'jpg', 'masivo') ;
     };
 
     this.getResultContainer = function () {
@@ -19,7 +22,7 @@ var Modulo = function () {
     this.getModule = function () {
         return module;
     };
-    
+
     this.cargarFormulario = function (r) {
         var valores = r;
         $('#id').val(valores[0]['id']);
@@ -30,11 +33,23 @@ var Modulo = function () {
         $('#perfil').val(valores[0]['perfil']);
         $('#estado').val(valores[0]['estado']);
 
-    }
-    
-    this.procesarConsulta = function(r){
-        
-    }
+    };
+
+    this.procesarConsulta = function (r) {
+
+    };
 
     var app = new Application(this);
+    this.getApp = function () {
+        return app;
+    };
+};
+
+var ModuleFunctions = function (modulo) {
+    
+
+};
+
+var ModuleEvents = function (modulo) {
+
 };

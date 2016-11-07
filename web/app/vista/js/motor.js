@@ -403,7 +403,7 @@ var Application = function (modulo) {
     cargarEventosGenerales();
 };
 
-var Archivero = function (input, dir, exten, prefijo, modulo) {
+var Archivero = function (input, dir, exten, prefijo) {
     $('<div>').attr('class', 'boton_carga').html('Elegir...').appendTo($('#' + input).parent());
     var fechaMarca = new Date().getFullYear() + '' + (new Date().getMonth() + 1 < 10 ? '0' + (new Date().getMonth() + 1) : (new Date().getMonth() + 1)) + '' + (new Date().getDate() < 10 ? '0' + new Date().getDate() : new Date().getDate()) + '' + (new Date().getHours() < 10 ? '0' + new Date().getHours() : new Date().getHours()) + '' + (new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes()) + '' + (new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds());
     $('#' + input).attr('readonly', true);
@@ -435,15 +435,15 @@ var Archivero = function (input, dir, exten, prefijo, modulo) {
         data: {
             destino: '/public' + dir,
             pfx: prefijo,
-            accion: 'cargarArchivo',
-            modulo: modulo
+            ejecucion: 'cargarArchivo'
         },
         onComplete: function (file, response) {
+            console.log(response);
             if (response !== 'error') {
                 $(divboton).html('Elegir...');
                 this.enable();
                 $('#' + input).val(response);
-                console.log(response);
+                $('#' + input).off('click');
                 $('#' + input).on('click', function () {
                     window.open(dir + '/' + response, '_blank');
                 });
@@ -493,27 +493,8 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
                 actualizarEditorTextarea(false);
             }, 300);
         });
-//        if (document.addEventListener) {
-//            document.addEventListener('paste', alPegar, false);
-//        }
     };
 
-//    var alPegar = function (e) {
-//        if (typeof e.clipboardData !== 'undefined') {
-//            var copiedData = e.clipboardData.items[0];
-//            if (copiedData.type.indexOf("image") === 0) {
-//                var imageFile = copiedData.getAsFile();
-//                var reader = new FileReader();
-//                reader.onload = function (evt) {
-//                    var result = evt.target.result;
-//                    var img = document.createElement("img");
-//                    img.src = result;
-//                    $('.text-editor-box .editionbox').append(img);
-//                };
-//                reader.readAsDataURL(imageFile);
-//            }
-//        }
-//    };
 
     var TextEditorTools = function () {
         var selection = undefined;

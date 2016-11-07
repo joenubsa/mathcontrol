@@ -8,7 +8,7 @@ var Modulo = function () {
     this.inicializarFormulario = function () {
         $('#id').hide();
         app.consultar();
-        new Archivero('txtArchivoMasivo', '/attachments', 'jpg', 'masivo') ;
+        new Archivero('txtArchivoMasivo', '/attachments/usuario', 'jpg') ;
     };
 
     this.getResultContainer = function () {

@@ -124,6 +124,7 @@ var ModuleFunctions = function (modulo) {
         $('.cuestionario-container').show();
         var preguntasCollection = JSON.parse(r.cuerpo);
         var cantidadPreguntas = preguntasCollection.length;
+        var esEntrenamiento = +r.esEntrenamiento;        
         var seleccion = [];
         for (var i = 0; i < 10; i++) {
             var seRepite = false;
@@ -160,6 +161,15 @@ var ModuleFunctions = function (modulo) {
                 $('<span>').html(decodeURI(respuesta.texto)).appendTo(label);
                 $('<li>').append(label).appendTo(respuestasOl);
             }
+            if (esEntrenamiento === 1) {
+                preguntaHTML.find('.preguntaacciones').append('<button type="button">Pasos</button>'+
+                    '<button type="button">Ejercicios Modelo</button>'+
+                    '<button type="button">Ejercicio Resuelto</button>'+
+                    '<button type="button">Ver mi resultado</button>'+
+                    '<button type="button">Otro Ejercicio</button>'+
+                    '<button type="button">Iniciar entrenamiento de problemas</button>'+
+                    '<button type="button">Iniciar Evaluación</button>');
+            }
             respuestasOl.appendTo(preguntaHTML.find('.respuestas'));
         }
     };
@@ -194,6 +204,9 @@ var ModuleFunctions = function (modulo) {
         if (sinCompletar) {
             alert('Debes completar el cuestionario antes de enviarlo');
             return false;
+        } else {
+            alert('Has completado el cuestionario satisfactoriamente');
+            $('.cuestionario-container').hide();
         }
 
         var args = {

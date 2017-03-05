@@ -8,7 +8,8 @@ var Modulo = function () {
     this.inicializarFormulario = function () {
         $('#id').hide();
         $('#cmdIniciarPrueba, .cuestionario-container').hide();
-        inicializarEventos();
+        inicializarEventos();        
+        moduleFunctions.validarModulosCondicionados();
         //app.consultar();
     };
 
@@ -44,7 +45,7 @@ var Modulo = function () {
 
     };
 
-    this.procesarConsulta = function (r, c) {
+    this.procesarConsulta = function (r, c, e) {
         switch (c) {
             case "articulo_actual":
                 moduleFunctions.renderizarArticulo(r.content[0]);
@@ -56,11 +57,26 @@ var Modulo = function () {
                     $('#cmdIniciarPrueba').on('click', function(){
                         moduleFunctions.renderizarCuestionario(r.content[0]);
                     });
+                } else {
+                    $('#cmdIniciarPrueba').hide();
                 }
                 break;
             case "traer_cuestionario":
                 //moduleFunctions.renderizarCuestionario(r.content[0]);
                 break;
+            case "renderizar_menu":
+                moduleFunctions.renderizarMenu(r.content);
+                break;
+            case "result_":
+                switch (e) {
+                    case "validarModulosCondicionados":
+                        if (r.content === true) {
+                            $('.modulos .condicionados').show();
+                        }
+                        break;
+                }
+                break;
+            
         }
     };
 
@@ -96,6 +112,7 @@ var ModuleFunctions = function (modulo) {
             modulo: moduloId
         };
         app.consultar(null, 'articulo_actual', 'articulo_actual', args);
+        app.consultar(null, 'renderizar_menu', 'renderizar_menu', args); 
     };
     
     this.verificarCuestionario = function (articulo_id) {
@@ -114,10 +131,10 @@ var ModuleFunctions = function (modulo) {
         app.consultar(null, 'traer_cuestionario', 'traer_cuestionario', args);
     };
 
-    this.renderizarArticulo = function (r) {
+    this.renderizarArticulo = function (r) {        
         $('.progreso_articulo-container input[name=articulo_id]').val(r.id);
         $('.progreso_articulo-container .titulo').html(r.nombre);
-        $('.progreso_articulo-container .cuerpo').html(r.descripcion);
+        $('.progreso_articulo-container .cuerpo .contenido').html(r.descripcion);
     };
 
     this.renderizarCuestionario = function (r) {
@@ -214,6 +231,22 @@ var ModuleFunctions = function (modulo) {
             respuestas : JSON.stringify(respuestas)
         };
         app.ejecutar('terminarPruebaAction', args);
+    };
+    
+    this.renderizarMenu = function(r){
+        $('.progreso_articulo-container .cuerpo .menu').find('ul').remove();
+        var menuhtml = $('<ul>').appendTo('.progreso_articulo-container .cuerpo .menu');
+        for (var i in r) {
+            var item = r[i];
+            $('<li>').html(item.nombre).on('click', function(){
+                alert('ya terminaste este módulo');
+            }).appendTo(menuhtml);
+        }
+    };
+    
+    this.validarModulosCondicionados = function() {
+        app = modulo.getApp();
+        app.ejecutar('validarModulosCondicionados');
     };
 
 };

@@ -56,7 +56,7 @@ var Application = function (modulo) {
                         alert("Registro procesado correctamente");
                         break;
                     case "error":
-                        alert("Hay un problema: " + respuesta.content);
+                        alert("Tuvimos un problema: " + respuesta.content);
                         break;
                     case "data":
                         switch (llenar) {
@@ -102,7 +102,7 @@ var Application = function (modulo) {
         }
         if (resultset.length === 0 || !resultset) {
             var tr = $('<tr>').appendTo(tabla);
-            $('<td colspan=99>').html("No se encontraror registros").appendTo(tr);
+            $('<td colspan=99>').html("No se encontraron registros").appendTo(tr);
             return true;
         }
         for (var i in resultset) {

@@ -56,7 +56,7 @@ var Application = function (modulo) {
                         alert("Registro procesado correctamente");
                         break;
                     case "error":
-                        alert("Tuvimos un problema: " + respuesta.content);
+                        alert("Atención: " + respuesta.content);
                         break;
                     case "data":
                         switch (llenar) {
@@ -80,9 +80,11 @@ var Application = function (modulo) {
                         break;
                 }
             },
-            error: function (error) {
+            error: function (error, b, c) {
                 console.log('error:\r\n');
                 console.log(error.responseText);
+                console.log(b);
+                console.log(c);
             }
         });
     }
@@ -191,7 +193,7 @@ var Application = function (modulo) {
                         modulo.procesarConsulta(respuesta, 'result_', evento);
                         break;
                     case "error":
-                        alert("Hay un problema: " + respuesta.content);
+                        alert("Atención! " + respuesta.content);
                         break;
                     case null:
                     case "message":
@@ -433,19 +435,18 @@ var Archivero = function (input, dir, exten, prefijo) {
             }
         },
         data: {
-            destino: '/public' + dir,
+            destino: 'public/' + dir,
             pfx: prefijo,
             ejecucion: 'cargarArchivo'
         },
         onComplete: function (file, response) {
-            console.log(response);
             if (response !== 'error') {
                 $(divboton).html('Elegir...');
                 this.enable();
                 $('#' + input).val(response);
                 $('#' + input).off('click');
                 $('#' + input).on('click', function () {
-                    window.open(dir + '/' + response, '_blank');
+                    window.open('public/' + dir + '/' + response, '_blank');
                 });
             } else {
                 alert('No se ha podido cargar el archivo. Contactese con el administrador del sistema.');

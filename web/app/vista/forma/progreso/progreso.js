@@ -49,6 +49,11 @@ var Modulo = function () {
                 break;
             case "verificar_cuestionario":
                 if (r.content.length > 0) {
+                    if (+r.content[0].esEntrenamiento === 1) {
+                        $('#cmdIniciarPrueba').html('Entrenamiento');
+                    } else {
+                        $('#cmdIniciarPrueba').html('Iniciar Prueba');
+                    }
                     $('#cmdIniciarPrueba').show();
                     $('#cmdIniciarPrueba').on('click', function () {
                         moduleFunctions.renderizarCuestionario(r.content[0]);
@@ -64,7 +69,7 @@ var Modulo = function () {
                     $('#cmdVerForo').show();
                     $('#cmdVerForo').on('click', function () {
                         moduleFunctions.renderizarForo(r.content[0]);
-                        
+
                     });
                 } else {
                     $('#cmdVerForo').hide();
@@ -170,6 +175,7 @@ var ModuleFunctions = function (modulo) {
         $('.progreso_articulo-container .titulo').html(r.nombre);
         $('.progreso_articulo-container .cuerpo .contenido').html(r.descripcion);
         $('.progreso_articulo-container .acciones .flujo').html('');
+        $('.cuestionario-container').hide();
         if (r.sucesor_alternativo != null) {
             var etiquetas = r.nombre_opciones.split(';');
             $('<button>').attr('type', 'button').html(etiquetas[0]).appendTo('.progreso_articulo-container .acciones .flujo').on('click', function () {
@@ -178,13 +184,21 @@ var ModuleFunctions = function (modulo) {
             $('<button>').attr('type', 'button').html(etiquetas[1]).appendTo('.progreso_articulo-container .acciones .flujo').on('click', function () {
                 modulo.ModuleFunctions.consultarArticulo(sessionStorage.currentModulo, r.sucesor_alternativo);
             });
-
+            sessionStorage.articleBefore = r.id;
         } else {
             $('<button>').html('-> Continuar ->').attr('type', 'button').on('click', function () {
                 modulo.ModuleFunctions.avanzarAction();
                 $("#" + sessionStorage.currentModulo).trigger('click');
                 $("body").animate({scrollTop: 0}, 1000);
             }).appendTo('.progreso_articulo-container .acciones .flujo');
+
+            if (typeof sessionStorage.articleBefore !== 'undefined') {
+                var articleBefore = sessionStorage.articleBefore;
+                $('<button>').html('Ver otro método').attr('type', 'button').on('click', function () {
+                    modulo.ModuleFunctions.consultarArticulo(sessionStorage.currentModulo, articleBefore);
+                }).appendTo('.progreso_articulo-container .acciones .flujo');
+                delete sessionStorage.articleBefore;
+            }
         }
     };
 
@@ -195,14 +209,16 @@ var ModuleFunctions = function (modulo) {
         var esEntrenamiento = +r.esEntrenamiento;
         var seleccion = [];
         var numpreg = esEntrenamiento === 1 ? 1 : 10;
-        console.log(preguntasCollection);
+        if (cantidadPreguntas < numpreg) {
+            numpreg = cantidadPreguntas;
+        }
         for (var i = 0; i < numpreg; i++) {
+            console.log(cantidadPreguntas);
             var seRepite = false;
             do {
                 seRepite = false;
                 var pregSeleccionada = Math.floor((Math.random() * cantidadPreguntas));
                 for (var k in seleccion) {
-                    alert(seleccion[k]);
                     if (seleccion[k] === pregSeleccionada) {
                         seRepite = true;
                     }
@@ -210,7 +226,6 @@ var ModuleFunctions = function (modulo) {
                 if (!seRepite) {
                     seleccion [i] = pregSeleccionada;
                 }
-                alert('whaaat');
             } while (seRepite);
         }
 
@@ -234,23 +249,35 @@ var ModuleFunctions = function (modulo) {
                 $('<li>').append(label).appendTo(respuestasOl);
 
             }
-            if (esEntrenamiento === 1) {
-                var accionesPreguntaContainer = preguntaHTML.find('.preguntaacciones');
+            
+            console.log(esEntrenamiento);
+            var accionesPreguntaContainer = preguntaHTML.find('.preguntaacciones');
+            if (esEntrenamiento === 1) {                
                 accionesPreguntaContainer.empty();
-                $('<button>').html('Pasos').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
-                $('<button>').html('Ejercicios Modelo').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
-                $('<button>').html('Ejercicio Resuelto').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
+                $('<button>').html('Pasos').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
+                    modulo.ModuleFunctions.consultarArticulo(sessionStorage.currentModulo, r.pasos_id);
+                });
+                $('<button>').html('Ejercicios Modelo').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
+                    modulo.ModuleFunctions.consultarArticulo(sessionStorage.currentModulo, r.modelo_id);
+                });
+                $('<button>').html('Ejercicio Resuelto').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
+                    modulo.ModuleFunctions.consultarArticulo(sessionStorage.currentModulo, r.resuelto_id);
+                });
                 $('<button>').html('Ver mi resultado').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
-                $('<button>').html('Otro Ejercicio').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
-                $('<button>').html('Iniciar entrenamiento de problemas').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
-                $('<button>').html('Iniciar Evaluación').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
+                $('<button>').html('Otro Ejercicio').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
+                    modulo.ModuleFunctions.renderizarCuestionario(r);
+                });
+                $('<button>').html('Iniciar entrenamiento de problemas').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
+                    modulo.ModuleFunctions.renderizarCuestionario(r, true);
+                });
+                $('<button>').html('Iniciar Evaluación').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
+                    modulo.ModuleFunctions.consultarArticulo(sessionStorage.currentModulo, r.evaluacion_id);
+                });
+            } else {
+                accionesPreguntaContainer.empty();
             }
             respuestasOl.appendTo(preguntaHTML.find('.respuestas'));
 
-            $('#cmdOtroEjercicio').off('click');
-            $('#cmdOtroEjercicio').on('click', function () {
-
-            });
         }
         $('.cuestionario-container .acciones').empty();
         if (!esEntrenamiento) {
@@ -277,7 +304,7 @@ var ModuleFunctions = function (modulo) {
         $('#cmdGuardarForo').on('click', function () {
             modulo.ModuleFunctions.guardarForo();
         });
-        modulo.ModuleFunctions.consultarForoSocial();        
+        modulo.ModuleFunctions.consultarForoSocial();
     };
 
     this.avanzarAction = function () {
@@ -341,7 +368,7 @@ var ModuleFunctions = function (modulo) {
             }).appendTo(menuhtml);
         }
     };
-    
+
     this.guardarForo = function () {
         if ($('#foro_adjunto').val() === 'error' || $('#foro_adjunto').val() === '') {
             alert('Debes cargar una imágen para guardar tu aporte.');
@@ -354,15 +381,15 @@ var ModuleFunctions = function (modulo) {
         };
         app.ejecutar('guardarForoAction', args);
     };
-    
-    this.consultarForoSocial = function (){
+
+    this.consultarForoSocial = function () {
         app = modulo.getApp();
         var args = {
             foro_id: $('#foro_id').val()
         };
         app.consultar(null, 'foro_social', 'foro_social', args);
     };
-    
+
     this.renderizarForoSocial = function (r) {
         $('.foro-social').empty();
         for (var i in r) {

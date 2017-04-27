@@ -501,7 +501,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
         var selection = undefined;
         var attachEvents = function () {
             var events = new eventCollection();
-            var toolBox = $('.text-editor-box .toolbox');
+            var toolBox = editor.siblings('.toolbox');            
             toolBox.find('.icon').each(function () {
                 switch ($(this).attr('id')) {
                     case "icon-h2":
@@ -631,17 +631,18 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
             }
         };
 
-        var crearHerramientas = function () {
-            $('<div>').attr('class', 'icon').attr('id', 'icon-green').html('<span style="color:green">&#198;</span>').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-blue').html('<span style="color:blue">&#198;</span>').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-red').html('<span style="color:red">&#198;</span>').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-h2').html('H2').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-h3').html('H3').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-i').html('<i>i</i>').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-b').html('<strong>B</strong>').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-sup').html('X<sup>2</sup>').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-removetags').html('<strike>&lt;C&gt;</strike>').appendTo('div.text-editor-box .toolbox');
-            $('<div>').attr('class', 'icon').attr('id', 'icon-clearscreen').html('[x]').appendTo('div.text-editor-box .toolbox');
+        var crearHerramientas = function () {            
+            var toolBox = editor.siblings('.toolbox');
+            $('<div>').attr('class', 'icon').attr('id', 'icon-green').html('<span style="color:green">&#198;</span>').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-blue').html('<span style="color:blue">&#198;</span>').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-red').html('<span style="color:red">&#198;</span>').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-h2').html('H2').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-h3').html('H3').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-i').html('<i>i</i>').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-b').html('<strong>B</strong>').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-sup').html('X<sup>2</sup>').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-removetags').html('<strike>&lt;C&gt;</strike>').appendTo(toolBox);
+            $('<div>').attr('class', 'icon').attr('id', 'icon-clearscreen').html('[x]').appendTo(toolBox);
         };
 
         var inicializar = function () {
@@ -653,7 +654,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
 
     var actualizarEditorTextarea = function (event) {
         var contenidoActual = editor.html();
-        $('div.text-editor-box textarea').val(contenidoActual);
+        $('div.text-editor-box.main textarea').val(contenidoActual);
         if (!event) {
             procesarImagenes();
         }
@@ -679,10 +680,10 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
     };
 
     var removerEstilos = function () {
-        var texto = $('div.text-editor-box .editionbox').html();
+        var texto = editor.html();
         var regex = /style="[\s\S]+?"/gm;
         texto = texto.replace(regex, '');
-        $('div.text-editor-box .editionbox').html(texto);
+        editor.html(texto);
         actualizarEditorTextarea();
     };
 

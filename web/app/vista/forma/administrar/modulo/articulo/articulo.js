@@ -15,7 +15,7 @@ var Modulo = function () {
         inicializarEventos();
         app.consultar(null, 'ListaArticulos', 'ListaArticulos');
         articulosPicker = new ArticulosPicker();
-        textEditorEngine = new TextEditorEngine(this, $('.text-editor-box .editionbox'), 'articulo');
+        textEditorEngine = new TextEditorEngine(this, $('.text-editor-box .editionbox.articulo'), 'articulo');
         textEditorEngine.activar();
     };
 

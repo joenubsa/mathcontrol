@@ -218,6 +218,7 @@ var Application = function (modulo) {
             dataType: 'json',
             url: 'index.php',
             success: function (respuesta) {
+                console.log(respuesta);
                 switch (respuesta.returned) {
                     case "ok":
                         alert("Registro guardado correctamente");
@@ -226,7 +227,7 @@ var Application = function (modulo) {
                     case "id":
                         modulo.getFormulario()[0].reset();
                         consultar();
-                        break;
+                        break;                    
                     default:
                         alert(respuesta.content);
                         break;
@@ -402,6 +403,33 @@ var Application = function (modulo) {
         return vars;
     };
 
+    this.mensaje = function (textoMensaje, textoTitulo) {
+        textoTitulo = textoTitulo | 'Atención!';
+        var container = $('<div>').attr('class', 'math-alert-container');
+        var body = $('<div>').attr('class', 'ma-body');
+        var rowTemplate = $('<div>').attr('class', 'ma-row');
+        var title = $('<div>').attr('class', 'ma-title').html(textoTitulo);
+        var content = $('<div>').attr('class', 'ma-content').html(textoMensaje);
+        var cmdAccept = $('<button>').attr('type', 'button').on('click', function(){
+            container.hide('fast', function () {
+                container.remove();
+            });
+            $.unblockUI();
+        });
+        body.appendTo(container);
+        rowTemplate.clone().append(title).appendTo(body);
+        rowTemplate.clone().append(content).appendTo(body);
+        rowTemplate.clone().append(cmdAccept).appendTo(body);
+        $.blockUI({
+            message: container,
+            css: {
+                width: '400px',
+                height: '250px'                
+            }
+        });
+
+    }
+
     cargarEventosGenerales();
 };
 
@@ -465,6 +493,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
      * 5. sirvase al gusto
      * 
      */
+    var editorTextArea = editor.parents('.text-editor-box').find('textarea');
     if (!modulo) {
         console.log("TextEditor: Requiere un modulo.");
         return false;
@@ -476,20 +505,20 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
     var app = modulo.getApp();
     var agregarEventos = function () {
 
-        $('.text-editor-box .editionbox').on('keyup', function (event) {
+        editor.on('keyup', function (event) {
             actualizarEditorTextarea(event);
         });
-        $('.text-editor-box .editionbox').on('change', function (event) {
+        editor.on('change', function (event) {
             actualizarEditorTextarea(event);
         });
-        $('.text-editor-box .editionbox').on('input', function (event) {
+        editor.on('input', function (event) {
             actualizarEditorTextarea(event);
         });
-        $('.text-editor-box .editionbox').on('propertyChanged', function (event) {
+        editor.on('propertyChanged', function (event) {
             actualizarEditorTextarea(event);
         });
 
-        $('.text-editor-box .editionbox').on('paste', function (event) {
+        editor.on('paste', function (event) {
             setTimeout(function () {
                 actualizarEditorTextarea(false);
             }, 300);
@@ -501,7 +530,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
         var selection = undefined;
         var attachEvents = function () {
             var events = new eventCollection();
-            var toolBox = editor.siblings('.toolbox');            
+            var toolBox = editor.siblings('.toolbox');
             toolBox.find('.icon').each(function () {
                 switch ($(this).attr('id')) {
                     case "icon-h2":
@@ -631,7 +660,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
             }
         };
 
-        var crearHerramientas = function () {            
+        var crearHerramientas = function () {
             var toolBox = editor.siblings('.toolbox');
             $('<div>').attr('class', 'icon').attr('id', 'icon-green').html('<span style="color:green">&#198;</span>').appendTo(toolBox);
             $('<div>').attr('class', 'icon').attr('id', 'icon-blue').html('<span style="color:blue">&#198;</span>').appendTo(toolBox);
@@ -654,7 +683,7 @@ var TextEditorEngine = function (modulo, editor, carpeta) {
 
     var actualizarEditorTextarea = function (event) {
         var contenidoActual = editor.html();
-        $('div.text-editor-box.main textarea').val(contenidoActual);
+        editorTextArea.val(contenidoActual);
         if (!event) {
             procesarImagenes();
         }

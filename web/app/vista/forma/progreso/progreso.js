@@ -36,13 +36,6 @@ var Modulo = function () {
 
 
     this.cargarFormulario = function (r) {
-//        var valores = r;
-//        $('#id').val(valores[0]['id']);
-//        $('#nombre').val(valores[0]['nombre']);
-//        $('#descripcion').val(valores[0]['descripcion']);
-//        $('#modulo_id').val(valores[0]['modulo_id']);
-//        $('#progreso_id').val(valores[0]['progreso_id']);
-//        $('#estado').val(valores[0]['estado']);
     };
 
     this.onCargarFormulario = function (r) {
@@ -291,6 +284,9 @@ var ModuleFunctions = function (modulo) {
             preguntaHTML.find('.texto').html(decodeURI(pregunta.texto));
             preguntaHTML.find('.respuestas').html(pregunta.respuestas);
             var respuestasOl = $('<ol>').attr('type', 'a');
+            pregunta.respuestas = pregunta.respuestas.sort(function () {
+                return 0.5 - Math.random();
+            });
             for (var k in pregunta.respuestas) {
                 var respuesta = pregunta.respuestas[k];
                 var label = $('<label>');
@@ -394,7 +390,6 @@ var ModuleFunctions = function (modulo) {
             alert('Debes completar el cuestionario antes de enviarlo');
             return false;
         } else {
-            alert('Has completado el cuestionario satisfactoriamente!');
             $('.cuestionario-container, .foro-container').hide();
         }
 

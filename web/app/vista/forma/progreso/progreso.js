@@ -56,6 +56,11 @@ var Modulo = function () {
                     } else {
                         $('#cmdIniciarPrueba').html('Iniciar Prueba');
                     }
+                    
+                    if (+r.content[0].id === 5 || +r.content[0].id === 10 || +r.content[0].id === 14) {
+                        $('#cmdIniciarPrueba').html('Iniciar Autoevaluación');
+                    }
+
                     $('#cmdIniciarPrueba').show();
                     $('#cmdIniciarPrueba').on('click', function () {
                         moduleFunctions.renderizarCuestionario(r.content[0]);
@@ -194,7 +199,11 @@ var ModuleFunctions = function (modulo) {
             });
             sessionStorage.articleBefore = r.id;
         } else {
-            $('<button>').html('-> Continuar ->').attr('type', 'button').on('click', function () {
+            var continuarLabel = "-> Continuar ->";
+            if (+r.id === 51 || +r.id === 103 || +r.id === 112) {
+                continuarLabel = "Iniciar evaluación";
+            }
+            $('<button>').html(continuarLabel).attr('type', 'button').on('click', function () {
                 modulo.ModuleFunctions.avanzarAction();
                 $("#" + sessionStorage.currentModulo).trigger('click');
                 $("body").animate({scrollTop: 0}, 1000);

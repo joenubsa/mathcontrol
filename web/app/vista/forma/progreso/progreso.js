@@ -12,7 +12,7 @@ var Modulo = function () {
         $('#cmdIniciarPrueba, .cuestionario-container, .foro-container, #cmdVerForo').hide();
         inicializarEventos();
 //        moduleFunctions.validarModulosCondicionados();
-        new Archivero('foro_adjunto', 'images/foro', 'jpg;png', null, module);
+//        new Archivero('foro_adjunto', 'images/foro', 'jpg;png', null, module);
         cuestionarioOriginal = $('.cuestionario-container').html();
         foroOriginal = $('.foro-container').html();
         if (typeof app.getVars('moduloid') !== 'undefined' && typeof app.getVars('articuloid') !== 'undefined') {
@@ -21,9 +21,25 @@ var Modulo = function () {
 
         if (typeof app.getVars('mode') !== 'undefined' && app.getVars('mode') === 'iframe') {
             $('.modulos, .menu, .acciones').hide();
+        }        
+        if (!$('#showTargets') || $('#showTargets').length === 0) {
+            $('#cmdResumen').hide();
         }
 
-        //app.consultar();
+        textEditorEngine = new TextEditorEngine(this, $('.text-editor-box.respuesta .editionbox'), 'respuesta');
+        textEditorEngine.activar();
+        $('#icon-green, #icon-blue, #icon-red, #icon-h2, #icon-h3, #icon-i, #icon-b, #icon-removetags').remove();
+        $('.editionbox').css({'height': '100px'});
+
+        $('#cmdMod_2').trigger('click');
+        setTimeout(function () {
+            $('li[data-articulo="111"]').trigger('click');
+            setTimeout(function () {
+                $('#cmdIniciarPrueba').trigger('click');
+            }, 100);
+        }, 500);
+
+
     };
 
     var inicializarEventos = function () {
@@ -31,6 +47,26 @@ var Modulo = function () {
         $('#cmdResumen').on('click', function () {
             //document.location = "/?modulo=temario";
             moduleFunctions.mostrarMetas();
+        });
+
+        $('.respuestaEditorContainer #respuestaAceptar').on('click', function () {
+            var pregunta_id = sessionStorage.respuestaCaller.split('_')[1];
+            var respuestaTextoDiv = $('#' + sessionStorage.respuestaCaller).parent().find('div[data-id=preguntaPreview_' + pregunta_id + ']');
+            var respuestaTextoInput = $('#' + sessionStorage.respuestaCaller).parent().find('input[name=pregunta_' + pregunta_id +']');
+            var respuestaTexto = $('.text-editor-box.respuesta .editionbox').html().trim();
+            respuestaTextoInput.val(respuestaTexto);
+            respuestaTextoDiv.html(respuestaTexto);
+            $('.text-editor-box.respuesta .editionbox').html("");
+            $('.respuestaEditorContainer').hide('fast');
+            $('#' + sessionStorage.respuestaCaller).parents('.PanelRespuesta').find('.agregarRespuesta').trigger('click');
+            delete sessionStorage.respuestaCaller;
+
+        });
+
+        $('.respuestaEditorContainer #respuestaCancelar').on('click', function () {
+            $('.text-editor-box.respuesta .editionbox').html("");
+            $('.respuestaEditorContainer').hide('fast');
+            delete sessionStorage.respuestaCaller;
         });
     };
 
@@ -56,7 +92,7 @@ var Modulo = function () {
                     } else {
                         $('#cmdIniciarPrueba').html('Iniciar Prueba');
                     }
-                    
+
                     if (+r.content[0].id === 5 || +r.content[0].id === 10 || +r.content[0].id === 14) {
                         $('#cmdIniciarPrueba').html('Iniciar Autoevaluación');
                     }
@@ -73,6 +109,7 @@ var Modulo = function () {
                 break;
             case "verificar_foro":
                 if (r.content.length > 0) {
+                    restartForo();
                     $('#cmdVerForo').show();
                     $('#cmdVerForo').on('click', function () {
                         moduleFunctions.renderizarForo(r.content[0]);
@@ -189,6 +226,8 @@ var ModuleFunctions = function (modulo) {
         modulo.ModuleFunctions.activarDescripcion($('.progreso_articulo-container .cuerpo .contenido'));
         $('.progreso_articulo-container .acciones .flujo').html('');
         $('.cuestionario-container').hide();
+        $('.foro-container').hide();
+        $('.foro-container').find('iframe').remove();
         if (r.sucesor_alternativo != null) {
             var etiquetas = r.nombre_opciones.split(';');
             $('<button>').attr('type', 'button').html(etiquetas[0]).appendTo('.progreso_articulo-container .acciones .flujo').on('click', function () {
@@ -296,15 +335,36 @@ var ModuleFunctions = function (modulo) {
             pregunta.respuestas = pregunta.respuestas.sort(function () {
                 return 0.5 - Math.random();
             });
-            for (var k in pregunta.respuestas) {
-                var respuesta = pregunta.respuestas[k];
+
+            if (pregunta.respuestas.length > 0) {
+                for (var k in pregunta.respuestas) {
+                    var respuesta = pregunta.respuestas[k];
+                    var label = $('<label>');
+                    var input = $('<input>').attr('type', 'radio').attr('data-validate', respuesta.correcta).attr('name', 'pregunta_' + pregunta.id).val(respuesta.id);
+                    label.append(input);
+                    $('<span>').html(decodeURI(respuesta.texto)).appendTo(label);
+                    $('<li>').append(label).appendTo(respuestasOl);
+
+                }
+            } else {
                 var label = $('<label>');
-                var input = $('<input>').attr('type', 'radio').attr('data-validate', respuesta.correcta).attr('name', 'pregunta_' + pregunta.id).val(respuesta.id);
-                label.append(input);
-                $('<span>').html(decodeURI(respuesta.texto)).appendTo(label);
-                $('<li>').append(label).appendTo(respuestasOl);
+                $('<div>').attr('data-id', 'preguntaPreview_' + pregunta.id).css({
+                    width : '300px',
+                    height : '15px',
+                    border : '1px solid #000',
+                    position: 'relative',
+                    display: 'inline-block',
+                    padding: '2px'
+                }).appendTo(label);
+                $('<input>').attr('type', 'hidden').attr('data-validate', false).attr('name', 'pregunta_' + pregunta.id).appendTo(label);
+                $('<button>').attr('type', 'button').attr('id', 'cmdPregunta_' + pregunta.id).html('Editar la respuesta').on('click', function () {
+                    sessionStorage.respuestaCaller = $(this).attr('id');
+                    $('.respuestaEditorContainer').show('fast');
+                }).appendTo(label);
+                $('<li>').attr('type', 'i').append(label).appendTo(respuestasOl);
 
             }
+
 
             //console.log(esEntrenamiento);
             var accionesPreguntaContainer = preguntaHTML.find('.preguntaacciones');
@@ -316,9 +376,12 @@ var ModuleFunctions = function (modulo) {
                 $('<button>').html('Ejercicios Modelo').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
                     modulo.ModuleFunctions.mostrarAyudasEntrenamiento(r.modelo_id);
                 });
-                $('<button>').html('Ejercicio Resuelto').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
-                    modulo.ModuleFunctions.mostrarAyudasEntrenamiento(r.resuelto_id, pregunta.id);
-                });
+
+                if (r.resuelto_id) {
+                    $('<button>').html('Ejercicio Resuelto').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
+                        modulo.ModuleFunctions.mostrarAyudasEntrenamiento(r.resuelto_id, pregunta.id);
+                    });
+                }
 //                $('<button>').html('Ver mi resultado').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {});
                 $('<button>').html('Otro Ejercicio').attr('class', 'accion_entrenamiento').appendTo(accionesPreguntaContainer).on('click', function () {
                     modulo.ModuleFunctions.renderizarCuestionario(r);
@@ -348,6 +411,7 @@ var ModuleFunctions = function (modulo) {
     };
 
     this.renderizarForo = function (r) {
+        new Archivero('foro_adjunto', 'images/foro', 'jpg;png', null, "progreso");
         $('.foro-container').show();
         $('#foro_id').val(r.id);
         $('.foro-container .foro-titulo h3').html(r.nombre);
@@ -355,6 +419,8 @@ var ModuleFunctions = function (modulo) {
         $('.foro-container foro_id').val(r.id);
         if (+r.id === 1) {
             $('.foro-container .juego').html('<iframe seamless="seamless" id="iframegame" scrolling="no" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen="true" webkit-playsinline="true" src="http://cloudgames.com/games/html5/sudoku-village-en-s-iga-spil/index.html?gp=1&amp;siteid=86&amp;channelid=1&amp;siteLocale=es-ES&amp;spilStorageId=21148659664" style="width: 819.727px; height: 615px;" frameborder="0" height="751" width="1001.3333333333334"></iframe>');
+        } else {
+            $('.foro-container .juego').empty();
         }
         $('#cmdGuardarForo').off('click');
         $('#cmdGuardarForo').on('click', function () {
@@ -383,7 +449,7 @@ var ModuleFunctions = function (modulo) {
         };
         var sinCompletar = false;
         $('.cuestionario').find('.pregunta').each(function () {
-            var respuestaInput = $(this).find('input:checked');
+            var respuestaInput = $(this).find('input').attr('type') === 'radio' ? $(this).find('input:checked') : $(this).find('input');
             if (!respuestaInput.val() || respuestaInput.val() === '') {
                 sinCompletar = true;
             } else {
@@ -420,6 +486,9 @@ var ModuleFunctions = function (modulo) {
             $('<li>').attr('data-articulo', item.id).html(item.nombre).on('click', function () {
                 var moduloId = sessionStorage.currentModulo;
                 modulo.consultarArticulo(moduloId, $(this).data('articulo'));
+//                if (item.id === 18 || item.id === 55 || item.id === 119) {
+//                    new Archivero('foro_adjunto', 'images/foro', 'jpg;png', null, module);
+//                }
             }).appendTo(menuhtml);
         }
     };
